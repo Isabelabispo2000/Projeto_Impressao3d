@@ -1,0 +1,2 @@
+<?php
+foreach (['$2y$10$ACGh3mady4BxyyrZXaRhWO2ABe4HknhP7jZqkcCuhsK5tGj671.re','$2y$10$vguDypxWLkrkzhf4Y4CXZeeHizsGEUK8wOrTOrv7yLGWcUg5RVYoK','$2y$10$3ON.OZsdVwAAXjufe3c68OpeVC2INXnGW4sVNnpqM53nmKtF3YXFO','$2y$10$60zS103oFZHrOXtR6azh5.CmaU.CQW5Xp6D1IG/AU1TjUhkTvfAgW','$2y$10$ii/w0ERph/BOvCKdkacaK.cOlOKHWjLtF1.kG6cjlwMorH4DE6OeS','$2y$10$.wYFyI6rdnuNH5jMI6vQlOX1KZ/OgqzsEsAUYh7XTLCRwxcv0xTnC'] as $hash) { echo $hash, PHP_EOL; }

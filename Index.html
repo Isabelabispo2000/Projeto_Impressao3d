@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OctoView - Gestao de Impressao 3D</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip-link" href="#main-content">Pular para o conteudo principal</a>
+
+<div id="ld" aria-hidden="true">
+  <div class="ld-logo">
+    <div class="ld-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 22 8 22 16 12 22 2 16 2 8"></polygon><circle cx="12" cy="12" r="3"></circle></svg>
+    </div>
+    <span class="ld-name">Octo<b>View</b></span>
+  </div>
+  <div class="ld-track"><div class="ld-bar"></div></div>
+  <p class="ld-sub">Gestao de Impressao 3D · SENAC</p>
+</div>
+
+<section id="lsc" aria-labelledby="login-title">
+  <div class="theme-floating">
+    <button id="theme-toggle-login" class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="Alternar tema">Tema</button>
+  </div>
+  <div class="lc auth-card">
+    <div class="lc-logo">
+      <div class="lc-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 22 8 22 16 12 22 2 16 2 8"></polygon><circle cx="12" cy="12" r="3"></circle></svg></div>
+      <span class="lc-name">Octo<b>View</b></span>
+    </div>
+    <p class="lc-sub">Gestao inteligente de impressao 3D com autenticacao segura</p>
+    <form class="login-form" onsubmit="doLogin(event)">
+      <div class="fg2 full">
+        <label class="fl" for="login-user">Usuario</label>
+        <input class="fin" id="login-user" autocomplete="username" placeholder="Digite o usuario, email ou matricula" required>
+      </div>
+      <div class="fg2 full">
+        <label class="fl" for="login-pass">Senha</label>
+        <input class="fin" id="login-pass" type="password" autocomplete="current-password" placeholder="Digite sua senha" required>
+      </div>
+      <p id="login-title" class="assistive-copy">Entre com seu usuario cadastrado. A senha inicial padrao e formada por sobrenome + matricula.</p>
+      <button class="login-link" type="button" onclick="submitForgotPassword()">Esqueceu a senha?</button>
+      <button class="lbtn" type="submit">Entrar no sistema</button>
+    </form>
+  </div>
+</section>
+
+<div id="app" aria-hidden="true">
+  <aside class="sb">
+    <div class="sb-logo">
+      <div class="sb-mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 22 8 22 16 12 22 2 16 2 8"></polygon><circle cx="12" cy="12" r="3"></circle></svg></div>
+      <span class="sb-nm">Octo<b>View</b></span>
+    </div>
+    <div class="sb-user">
+      <div class="sb-av" id="sb-av">O</div>
+      <div>
+        <div class="sb-un" id="sb-nm">-</div>
+        <div class="sb-ur"><span class="rpill admin" id="sb-role">Admin</span></div>
+      </div>
+    </div>
+    <button class="sb-photo-btn" type="button" onclick="openProfilePhotoModal()">Alterar foto de perfil</button>
+    <nav class="sb-nav" aria-label="Navegacao principal">
+      <div class="nav-sec adm">Administracao</div>
+      <button class="ni adm" type="button" data-section="dashboard" onclick="go('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>Dashboard<div class="dot"></div></button>
+      <button class="ni" type="button" data-section="pedidos-admin" onclick="go('pedidos-admin')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>Fila de Pedidos<div class="dot"></div></button>
+      <button class="ni adm" type="button" data-section="estoque" onclick="go('estoque')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8"></path><line x1="12" y1="12" x2="12" y2="22"></line><line x1="3.27" y1="6.96" x2="12" y2="12"></line><line x1="20.73" y1="6.96" x2="12" y2="12"></line></svg>Estoque<div class="dot"></div></button>
+      <button class="ni adm" type="button" data-section="galeria-admin" onclick="go('galeria-admin')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>Galeria - Gestao<div class="dot"></div></button>
+      <button class="ni adm" type="button" data-section="usuarios" onclick="go('usuarios')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 00-3-3.87"></path><path d="M16 3.13a4 4 0 010 7.75"></path></svg>Usuarios<div class="dot"></div></button>
+      <div class="nav-sec">Solicitante</div>
+      <button class="ni" type="button" data-section="galeria" onclick="go('galeria')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>Galeria de Modelos<div class="dot"></div></button>
+      <button class="ni" type="button" data-section="novo-pedido" onclick="go('novo-pedido')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>Novo Pedido<div class="dot"></div></button>
+      <button class="ni" type="button" data-section="meus-pedidos" onclick="go('meus-pedidos')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><path d="M14 2v6h6"></path><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Meus Pedidos<div class="dot"></div></button>
+    </nav>
+    <div class="sb-ft">
+      <button id="theme-toggle-app" class="theme-toggle theme-toggle-app" type="button" onclick="toggleTheme()">Alternar tema</button>
+      <button class="lout" type="button" onclick="doLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sair da conta</button>
+    </div>
+  </aside>
+
+  <main class="main" id="main-content" tabindex="-1">
+    <div class="page">
+      <div class="sec" id="sec-dashboard">
+        <div class="sh dashboard-head">
+          <div class="dashboard-head-main">
+            <h1>Visao Geral</h1>
+            <p>Metricas e fila prioritaria, <span id="tb-userline"></span></p>
+          </div>
+          <div class="dashboard-head-tools">
+            <div class="tb-pill" id="tb-unit-wrap" style="display:none">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 9h6"></path><path d="M9 13h6"></path></svg>
+              <select id="tb-unit-filter" onchange="onUnitFilterChange(this.value)" aria-label="Filtrar por unidade">
+                <option value="">Todas as unidades</option>
+              </select>
+            </div>
+            <div class="tb-pill">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg>
+              <span id="tb-date"></span>
+            </div>
+          </div>
+        </div>
+        <div class="sg">
+          <div class="sc"><div class="sci b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"></path><rect x="9" y="3" width="6" height="4" rx="1"></rect></svg></div><div class="sv" id="stat-pedidos">0</div><div class="sl">Pedidos Ativos</div><div class="sd" id="stat-pedidos-det">Sem movimentacao recente</div></div>
+          <div class="sc"><div class="sci y"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8"></path></svg></div><div class="sv" id="stat-estoque">0</div><div class="sl">Rolos em Estoque</div><div class="sd w" id="stat-estoque-det">Nenhum alerta</div></div>
+          <div class="sc"><div class="sci g"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="sv" id="stat-concluidos">0</div><div class="sl">Concluidos</div><div class="sd" id="stat-concluidos-det">Historico do sistema</div></div>
+          <div class="sc"><div class="sci p"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 00-3-3.87"></path><path d="M16 3.13a4 4 0 010 7.75"></path></svg></div><div class="sv" id="stat-solicitantes">0</div><div class="sl">Solicitantes</div><div class="sd" id="stat-solicitantes-det">0 setores ativos</div></div>
+        </div>
+        <div class="al w" id="dash-alert" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg><span id="dash-alert-text"></span></div>
+        <div class="dg">
+          <div class="g">
+            <div class="ch"><div><div class="ct">Fila Prioritaria</div><div class="cs">Ordenada por setor e data</div></div><button class="btn bg bsm" type="button" onclick="go('pedidos-admin')">Ver tudo</button></div>
+            <div id="fila-prev"></div>
+          </div>
+          <div class="g">
+            <div class="ch"><div class="ct">Status dos Pedidos</div></div>
+            <div class="dw">
+              <div class="dp">
+                <div id="donut-chart"></div>
+                <div class="dc"><div class="dv" id="donut-total">0</div><div class="ds">ativos</div></div>
+              </div>
+              <div class="lg" id="status-legend"></div>
+            </div>
+          </div>
+        </div>
+        <div class="g" style="margin-top:16px">
+          <div class="ch"><div><div class="ct">Pedidos por Instrutor</div><div class="cs">Quantidade total de solicitacoes por instrutor</div></div></div>
+          <div class="chart-wrap" id="instr-chart"></div>
+        </div>
+        <div class="g" style="margin-top:16px">
+          <div class="ch"><div><div class="ct">Comparativo por Unidade</div><div class="cs" id="unit-metrics-subtitle">Impressoes no mes, horas de impressao e consumo de filamento</div></div></div>
+          <div class="chart-wrap" id="unit-metrics-chart"></div>
+        </div>
+      </div>
+
+      <div class="sec" id="sec-pedidos-admin">
+        <div class="sh"><div><h1>Fila de Pedidos</h1><p id="queue-subtitle">Acompanhe a fila de impressao da unidade visivel</p></div></div>
+        <div class="fb">
+          <div class="sw2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><input class="si" id="src-p" placeholder="Buscar pedido, solicitante..." oninput="filtP()"></div>
+          <select class="fsel" id="flt-s" onchange="filtP()"><option value="">Todos status</option><option>Pendente</option><option>Em Producao</option><option>Concluido</option><option>Retirado</option><option>Cancelado</option></select>
+          <select class="fsel" id="flt-st" onchange="filtP()"><option value="">Todos setores</option></select>
+        </div>
+        <div class="g"><div class="tw"><table><thead><tr><th>#</th><th>Solicitante</th><th>Setor</th><th>Modelo</th><th>Filamento</th><th>Prioridade</th><th>Status</th><th>Data</th><th>Acoes</th></tr></thead><tbody id="tbp"></tbody></table></div></div>
+      </div>
+
+      <div class="sec" id="sec-estoque">
+        <div class="sh"><div><h1>Estoque de Filamentos</h1><p>Monitore e gerencie os rolos disponiveis</p></div><button class="btn bp admin-only" type="button" onclick="openFilModal()">Adicionar Rolo</button></div>
+        <div class="al d" id="al-crit" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg><span id="al-crit-text">Filamento(s) em nivel critico.</span></div>
+        <div class="fg" id="fil-grid"></div>
+        <div style="margin-top:22px" class="g"><div class="ch"><div class="ct">Historico de Movimentacoes</div></div><div class="tw"><table><thead><tr><th>Data</th><th>Filamento</th><th>Tipo</th><th>Quantidade</th></tr></thead><tbody id="tbh"></tbody></table></div></div>
+      </div>
+
+      <div class="sec" id="sec-galeria-admin">
+        <div class="sh"><div><h1>Galeria - Gestao</h1><p>Adicione, edite ou remova modelos</p></div><button class="btn bp admin-only" type="button" onclick="openModModal()">Novo Modelo</button></div>
+        <div class="gg" id="gal-adm"></div>
+      </div>
+
+      <div class="sec" id="sec-usuarios">
+        <div class="sh"><div><h1>Cadastro de Usuarios</h1><p>Somente administradores podem cadastrar novos acessos</p></div></div>
+        <div class="g user-admin-grid">
+          <div class="mb">
+            <form class="form-grid" onsubmit="submitUserCreate(event)">
+              <input id="cu-id" type="hidden">
+              <div class="fg2 full"><label class="fl" for="cu-nome">Nome completo</label><input class="fin" id="cu-nome" required></div>
+              <div class="fg2"><label class="fl" for="cu-usuario">Usuario</label><input class="fin" id="cu-usuario" required></div>
+              <div class="fg2"><label class="fl" for="cu-matricula">Matricula</label><input class="fin" id="cu-matricula" inputmode="numeric" required></div>
+              <div class="fg2 full"><label class="fl" for="cu-email">Email</label><input class="fin" id="cu-email" type="email" required></div>
+              <div class="fg2"><label class="fl" for="cu-setor">Setor</label><select class="fin" id="cu-setor" required></select></div>
+              <div class="fg2"><label class="fl" for="cu-perfil">Perfil de acesso</label><select class="fin" id="cu-perfil"><option value="colaborador">Colaborador</option><option value="admin_local">Administrador Local</option><option value="admin_nacional">Administrador Nacional</option></select></div>
+              <div class="fg2 full"><label class="fl" for="cu-unit">Unidade</label><select class="fin" id="cu-unit" required></select></div>
+              <div class="fg2 full helper-panel"><strong>Senha inicial</strong><span>A senha padrao sera gerada como <b>matricula</b> e salva com hash seguro no banco.</span></div>
+              <div class="fa full-width-actions"><button class="btn bg" type="reset" onclick="resetCreateUserForm()">Limpar</button><button class="btn bp" id="cu-submit" type="submit">Cadastrar usuario</button></div>
+            </form>
+          </div>
+        </div>
+        <div class="g" style="margin-top:18px"><div class="ch"><div class="ct">Usuarios cadastrados</div></div><div class="tw"><table><thead><tr><th>Nome</th><th>Usuario</th><th>Matricula</th><th>Email</th><th>Unidade</th><th>Setor</th><th>Perfil</th><th>Status</th><th>Acoes</th></tr></thead><tbody id="tbu"></tbody></table></div></div>
+      </div>
+
+      <div class="sec" id="sec-galeria">
+        <div class="sh"><div><h1>Galeria de Modelos</h1><p>Selecione um modelo para solicitar impressao</p></div></div>
+        <div class="fb"><div class="sw2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><input class="si" id="src-g" placeholder="Buscar modelo..." oninput="filtG(this.value)"></div></div>
+        <div class="gg" id="gal-pub"></div>
+      </div>
+
+      <div class="sec" id="sec-novo-pedido">
+        <div class="sh"><div><h1>Novo Pedido</h1><p>Preencha os dados para solicitar uma impressao 3D</p></div></div>
+        <div style="max-width:640px">
+          <div class="gd">
+            <div class="ch"><div class="ct">Detalhes do Pedido</div></div>
+            <div class="mb">
+              <div class="form-grid">
+                <div class="fg2"><label class="fl" for="np-mod">Modelo da Galeria</label><select class="fin" id="np-mod"></select></div>
+                <div class="fg2"><label class="fl" for="np-fil">Filamento</label><select class="fin" id="np-fil"></select></div>
+                <div class="fg2 full"><label class="fl" for="np-fin">Finalidade *</label><input class="fin" id="np-fin" placeholder="Ex: Brinde institucional, peca de laboratorio..."></div>
+                <div class="fg2"><label class="fl" for="np-data">Data Limite</label><input type="date" class="fin" id="np-data"></div>
+                <div class="fg2"><label class="fl" for="np-obs">Observacoes</label><input class="fin" id="np-obs" placeholder="Detalhes adicionais..."></div>
+                <div class="fg2 full"><label class="fl">Imagem de Referencia</label><div class="uz" onclick="document.getElementById('np-file').click()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><p><span>Clique para enviar</span> ou arraste aqui</p><p style="font-size:0.7rem;margin-top:3px;color:var(--tx3)">PNG, JPG ate 5MB</p><img id="np-prev" class="up" alt="Preview do pedido"></div><input type="file" id="np-file" accept="image/*" style="display:none" onchange="prevImg(this,'np-prev')"></div>
+              </div>
+              <div class="fa"><button class="btn bg" type="button" onclick="resetNP()">Limpar</button><button class="btn bp" type="button" onclick="submitPed()">Enviar Pedido</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec" id="sec-meus-pedidos">
+        <div class="sh"><div><h1>Meus Pedidos</h1><p>Acompanhe o andamento das suas solicitacoes</p></div></div>
+        <div id="my-list" style="display:flex;flex-direction:column;gap:13px"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="mo" id="mf"><div class="md">
+  <div class="mh"><span class="mt" id="mf-title">Adicionar Filamento</span><button class="mx" type="button" onclick="closeM('mf')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>
+  <div class="mb">
+    <div class="form-grid">
+      <div class="fg2"><label class="fl" for="fi-cor">Cor</label><input class="fin" id="fi-cor" placeholder="Ex: Vermelho"></div>
+      <div class="fg2"><label class="fl" for="fi-tipo">Tipo</label><select class="fin" id="fi-tipo"><option>PLA</option><option>PETG</option><option>ABS</option><option>TPU</option></select></div>
+      <div class="fg2"><label class="fl" for="fi-peso">Peso Atual (g)</label><input type="number" class="fin" id="fi-peso" placeholder="1000"></div>
+      <div class="fg2"><label class="fl" for="fi-hex">Cor Hex</label><input class="fin" id="fi-hex" placeholder="#ffffff"></div>
+    </div>
+    <div class="fa"><button class="btn bg" type="button" onclick="closeM('mf')">Cancelar</button><button class="btn bp" type="button" onclick="saveFil()" id="mf-save">Salvar</button></div>
+  </div>
+</div></div>
+
+<div class="mo" id="mm"><div class="md">
+  <div class="mh"><span class="mt" id="mm-title">Adicionar Modelo</span><button class="mx" type="button" onclick="closeM('mm')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>
+  <div class="mb">
+    <div class="form-grid">
+      <div class="fg2 full"><label class="fl" for="mo-nm">Nome</label><input class="fin" id="mo-nm" placeholder="Ex: Suporte de Canetas"></div>
+      <div class="fg2 full"><label class="fl" for="mo-desc">Descricao</label><textarea class="fin" id="mo-desc" placeholder="Descreva o modelo..."></textarea></div>
+      <div class="fg2"><label class="fl" for="mo-peso">Peso Est. (g)</label><input type="number" class="fin" id="mo-peso" placeholder="35"></div>
+      <div class="fg2"><label class="fl" for="mo-link">Link STL</label><input class="fin" id="mo-link" placeholder="modelos/arquivo.stl"></div>
+      <div class="fg2 full"><label class="fl">Foto</label><div class="uz" onclick="document.getElementById('mo-file').click()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><p><span>Clique para enviar</span></p><img id="mo-prev" class="up" alt="Preview do modelo"></div><input type="file" id="mo-file" accept="image/*" style="display:none" onchange="prevImg(this,'mo-prev')"></div>
+    </div>
+    <div class="fa"><button class="btn bg" type="button" onclick="closeM('mm')">Cancelar</button><button class="btn bp" type="button" onclick="saveMod()" id="mm-save">Salvar</button></div>
+  </div>
+</div></div>
+
+<div class="mo" id="ms"><div class="md" style="width:390px">
+  <div class="mh"><span class="mt">Alterar Status</span><button class="mx" type="button" onclick="closeM('ms')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>
+  <div class="mb">
+    <p style="font-size:0.8rem;color:var(--tx2);margin-bottom:14px">Pedido <b id="st-pid" style="color:var(--tx)"></b></p>
+    <label class="fl" for="st-sel">Novo Status</label>
+    <select class="fin" id="st-sel" onchange="toggleStatusWeightField()"><option>Pendente</option><option>Em Producao</option><option>Concluido</option><option>Retirado</option><option>Cancelado</option></select>
+    <div id="st-weight-wrap" style="display:none;margin-top:14px">
+      <label class="fl" for="st-peso">Quantidade Gasta (g)</label>
+      <input type="number" min="0" step="0.1" class="fin" id="st-peso" placeholder="Ex: 27.5">
+      <p class="field-tip">Ao concluir ou retirar, esse valor sera gravado no pedido e descontado automaticamente do estoque.</p>
+    </div>
+    <div class="fa"><button class="btn bg" type="button" onclick="closeM('ms')">Cancelar</button><button class="btn bp" type="button" onclick="confirmSt()">Confirmar</button></div>
+  </div>
+</div></div>
+
+<div class="mo" id="mv"><div class="md" style="width:760px">
+  <div class="mh"><span class="mt">Detalhes do Pedido</span><button class="mx" type="button" onclick="closeM('mv')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>
+  <div class="mb">
+    <div class="order-detail-grid">
+      <div class="order-detail-card">
+        <div class="od-kicker" id="ov-id">Pedido</div>
+        <h3 class="od-title" id="ov-modelo">-</h3>
+        <div class="od-list" id="ov-meta"></div>
+      </div>
+      <div class="order-detail-card">
+        <div class="od-kicker">Imagem de Referencia</div>
+        <div class="order-image" id="ov-image"></div>
+      </div>
+    </div>
+    <div class="fa"><button class="btn bg" type="button" onclick="closeM('mv')">Fechar</button><button class="btn bp admin-only-inline" type="button" onclick="focusOrderStatusFromView()">Alterar Status</button></div>
+  </div>
+</div></div>
+
+<div class="mo" id="mphoto"><div class="md" style="width:430px">
+  <div class="mh"><span class="mt">Foto de Perfil</span><button class="mx" type="button" onclick="closeM('mphoto')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>
+  <div class="mb">
+    <div class="fg2 full"><label class="fl">Nova Foto</label><div class="uz" onclick="document.getElementById('photo-file').click()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><p><span>Clique para enviar</span></p><img id="photo-prev" class="up" alt="Preview da foto de perfil"></div><input type="file" id="photo-file" accept="image/*" style="display:none" onchange="prevImg(this,'photo-prev')"></div>
+    <div class="fa"><button class="btn bg" type="button" onclick="closeM('mphoto')">Cancelar</button><button class="btn bp" type="button" onclick="saveProfilePhoto()">Salvar Foto</button></div>
+  </div>
+</div></div>
+
+<div class="mo" id="mp"><div class="md">
+  <div class="mh"><span class="mt">Solicitar Impressao</span><button class="mx" type="button" onclick="closeM('mp')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>
+  <div class="mb">
+    <div id="gal-info" style="padding:12px 14px;background:rgba(37,99,235,0.05);border:1px solid rgba(37,99,235,0.12);border-radius:var(--r);margin-bottom:16px;font-size:0.82rem;color:var(--tx)"></div>
+    <div class="form-grid">
+      <div class="fg2 full"><label class="fl" for="gal-fil">Filamento</label><select class="fin" id="gal-fil"></select></div>
+      <div class="fg2 full"><label class="fl" for="gal-fin">Finalidade</label><input class="fin" id="gal-fin" placeholder="Ex: Uso em sala de aula"></div>
+      <div class="fg2"><label class="fl" for="gal-data">Data Limite</label><input type="date" class="fin" id="gal-data"></div>
+    </div>
+    <div class="fa"><button class="btn bg" type="button" onclick="closeM('mp')">Cancelar</button><button class="btn bp" type="button" onclick="pedirGal()">Enviar</button></div>
+  </div>
+</div></div>
+
+<div class="tw2" id="tw2" aria-live="polite" aria-atomic="true"></div>
+<span id="tb-t" hidden aria-hidden="true"></span>
+<div vw class="enabled">
+  <div vw-access-button class="active"></div>
+  <div vw-plugin-wrapper>
+    <div class="vw-plugin-top-wrapper"></div>
+  </div>
+</div>
+<script src="app.js" defer></script>
+<script>
+  (function(){
+    function syncDashboardDateTime(){
+      const dateNode=document.getElementById('tb-date');
+      if(!dateNode)return;
+      const now=new Date();
+      const dateLabel=now.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'});
+      const timeLabel=now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+      dateNode.textContent=`${dateLabel} · ${timeLabel}`;
+    }
+
+    function getScopeLabel(){
+      if(!window.currentUser)return '';
+      if(typeof window.isNationalAdmin==='function'&&window.isNationalAdmin()){
+        if(!window.selectedUnitId)return 'Geral';
+        const selectedUnit=(window.units||[]).find(unit=>String(unit.id)===String(window.selectedUnitId));
+        return selectedUnit?.nome||'Geral';
+      }
+      return window.currentUser.unidade||'Minha unidade';
+    }
+
+    function syncDashboardHeader(){
+      const subtitleNode=document.getElementById('tb-userline');
+      if(!subtitleNode||!window.currentUser)return;
+      const userLabel=window.currentUser.usuario||window.currentUser.nm||'';
+      subtitleNode.textContent=`${getScopeLabel()} / ${userLabel}`;
+    }
+
+    const originalSetupSidebar=window.setupSidebar;
+    if(typeof originalSetupSidebar==='function'){
+      window.setupSidebar=function(){
+        const result=originalSetupSidebar.apply(this,arguments);
+        syncDashboardHeader();
+        syncDashboardDateTime();
+        return result;
+      };
+    }
+
+    const originalOnUnitFilterChange=window.onUnitFilterChange;
+    if(typeof originalOnUnitFilterChange==='function'){
+      window.onUnitFilterChange=function(value){
+        const result=originalOnUnitFilterChange.apply(this,arguments);
+        syncDashboardHeader();
+        return result;
+      };
+    }
+
+    const originalRenderDashboard=window.renderDashboard;
+    if(typeof originalRenderDashboard==='function'){
+      window.renderDashboard=function(){
+        syncDashboardHeader();
+        return originalRenderDashboard.apply(this,arguments);
+      };
+    }
+
+    const originalRenderNationalDashboard=window.renderNationalDashboard;
+    if(typeof originalRenderNationalDashboard==='function'){
+      window.renderNationalDashboard=function(){
+        syncDashboardHeader();
+        return originalRenderNationalDashboard.apply(this,arguments);
+      };
+    }
+
+    document.addEventListener('DOMContentLoaded',function(){
+      syncDashboardDateTime();
+      window.setInterval(syncDashboardDateTime,30000);
+    });
+  })();
+</script>
+<script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+<script>
+  new window.VLibras.Widget('https://vlibras.gov.br/app');
+</script>
+</body>
+</html>
