@@ -68,6 +68,7 @@
       <button class="ni adm" type="button" data-section="estoque" onclick="go('estoque')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8"></path><line x1="12" y1="12" x2="12" y2="22"></line><line x1="3.27" y1="6.96" x2="12" y2="12"></line><line x1="20.73" y1="6.96" x2="12" y2="12"></line></svg>Estoque<div class="dot"></div></button>
       <button class="ni adm" type="button" data-section="galeria-admin" onclick="go('galeria-admin')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>Galeria - Gestao<div class="dot"></div></button>
       <button class="ni adm" type="button" data-section="usuarios" onclick="go('usuarios')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 00-3-3.87"></path><path d="M16 3.13a4 4 0 010 7.75"></path></svg>Usuarios<div class="dot"></div></button>
+      <button class="ni adm national-only" type="button" data-section="unidades" onclick="go('unidades')" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 9h6"></path><path d="M9 13h6"></path></svg>Unidades<div class="dot"></div></button>
       <div class="nav-sec">Solicitante</div>
       <button class="ni" type="button" data-section="galeria" onclick="go('galeria')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>Galeria de Modelos<div class="dot"></div></button>
       <button class="ni" type="button" data-section="novo-pedido" onclick="go('novo-pedido')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>Novo Pedido<div class="dot"></div></button>
@@ -158,22 +159,37 @@
       <div class="sec" id="sec-usuarios">
         <div class="sh"><div><h1>Cadastro de Usuarios</h1><p>Somente administradores podem cadastrar novos acessos</p></div></div>
         <div class="g user-admin-grid">
-          <div class="mb">
-            <form class="form-grid" onsubmit="submitUserCreate(event)">
-              <input id="cu-id" type="hidden">
-              <div class="fg2 full"><label class="fl" for="cu-nome">Nome completo</label><input class="fin" id="cu-nome" required></div>
-              <div class="fg2"><label class="fl" for="cu-usuario">Usuario</label><input class="fin" id="cu-usuario" required></div>
+	          <div class="mb">
+	            <form class="form-grid" onsubmit="submitUserCreate(event)">
+	              <input id="cu-id" type="hidden">
+	              <div class="fg2 full"><label class="fl" for="cu-nome">Nome completo</label><input class="fin" id="cu-nome" required></div>
+	              <div class="fg2"><label class="fl" for="cu-usuario">Usuario</label><input class="fin" id="cu-usuario" required></div>
               <div class="fg2"><label class="fl" for="cu-matricula">Matricula</label><input class="fin" id="cu-matricula" inputmode="numeric" required></div>
-              <div class="fg2 full"><label class="fl" for="cu-email">Email</label><input class="fin" id="cu-email" type="email" required></div>
-              <div class="fg2"><label class="fl" for="cu-setor">Setor</label><select class="fin" id="cu-setor" required></select></div>
-              <div class="fg2"><label class="fl" for="cu-perfil">Perfil de acesso</label><select class="fin" id="cu-perfil"><option value="colaborador">Colaborador</option><option value="admin_local">Administrador Local</option><option value="admin_nacional">Administrador Nacional</option></select></div>
-              <div class="fg2 full"><label class="fl" for="cu-unit">Unidade</label><select class="fin" id="cu-unit" required></select></div>
-              <div class="fg2 full helper-panel"><strong>Senha inicial</strong><span>A senha padrao sera gerada como <b>matricula</b> e salva com hash seguro no banco.</span></div>
-              <div class="fa full-width-actions"><button class="btn bg" type="reset" onclick="resetCreateUserForm()">Limpar</button><button class="btn bp" id="cu-submit" type="submit">Cadastrar usuario</button></div>
+	              <div class="fg2 full"><label class="fl" for="cu-email">Email</label><input class="fin" id="cu-email" type="email" required></div>
+	              <div class="fg2"><label class="fl" for="cu-setor">Setor</label><select class="fin" id="cu-setor" required></select></div>
+	              <div class="fg2"><label class="fl" for="cu-perfil">Perfil de acesso</label><select class="fin" id="cu-perfil"><option value="colaborador">Colaborador</option><option value="admin_local">Administrador Local</option><option value="admin_nacional">Administrador Nacional</option></select></div>
+	              <div class="fg2 full"><label class="fl" for="cu-unit">Unidade</label><select class="fin" id="cu-unit" required></select></div>
+	              <div class="fg2 full helper-panel"><strong>Senha inicial</strong><span>A senha padrao sera <b>1234</b> e podera ser alterada no primeiro acesso.</span></div>
+	              <div class="fa full-width-actions"><button class="btn bg" type="reset" onclick="resetCreateUserForm()">Limpar</button><button class="btn bp" id="cu-submit" type="submit">Cadastrar usuario</button></div>
+	            </form>
+	          </div>
+	        </div>
+	        <div class="g" style="margin-top:18px"><div class="ch"><div class="ct">Usuarios cadastrados</div></div><div class="tw"><table><thead><tr><th>Nome</th><th>Usuario</th><th>Matricula</th><th>Email</th><th>Unidade</th><th>Setor</th><th>Perfil</th><th>Status</th><th>Acoes</th></tr></thead><tbody id="tbu"></tbody></table></div></div>
+	      </div>
+
+      <div class="sec" id="sec-unidades">
+        <div class="sh"><div><h1>Cadastro de Unidades</h1><p>Somente administrador nacional pode cadastrar unidades</p></div></div>
+        <div class="g user-admin-grid">
+          <div class="mb">
+            <form class="form-grid" onsubmit="submitUnitCreate(event)">
+              <div class="fg2"><label class="fl" for="unit-cidade">Cidade</label><input class="fin" id="unit-cidade" required></div>
+              <div class="fg2"><label class="fl" for="unit-estado">Estado (UF)</label><input class="fin" id="unit-estado" maxlength="2" placeholder="PR" required></div>
+              <div class="fg2 full"><label class="fl" for="unit-codigo">Codigo da unidade</label><input class="fin" id="unit-codigo" placeholder="Ex: SENAC-CTBA" required></div>
+              <div class="fa full-width-actions"><button class="btn bg" type="reset" onclick="resetUnitCreateForm()">Limpar</button><button class="btn bp" type="submit">Cadastrar unidade</button></div>
             </form>
           </div>
         </div>
-        <div class="g" style="margin-top:18px"><div class="ch"><div class="ct">Usuarios cadastrados</div></div><div class="tw"><table><thead><tr><th>Nome</th><th>Usuario</th><th>Matricula</th><th>Email</th><th>Unidade</th><th>Setor</th><th>Perfil</th><th>Status</th><th>Acoes</th></tr></thead><tbody id="tbu"></tbody></table></div></div>
+        <div class="g" style="margin-top:18px"><div class="ch"><div class="ct">Unidades cadastradas</div></div><div class="tw"><table><thead><tr><th>Nome</th><th>Cidade</th><th>Estado</th><th>Codigo</th></tr></thead><tbody id="tb-units"></tbody></table></div></div>
       </div>
 
       <div class="sec" id="sec-galeria">

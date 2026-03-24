@@ -177,8 +177,14 @@ VALUES (
     'modelos/chaveiro_senac.stl', 
     'fotos/chaveiro_logo.jpg'
 );
-ALTER TABLE Estoque_Filamento 
-ADD CONSTRAINT chk_peso_positivo CHECK (peso_atual_gramas >= 0);
+-- Compatibilidade: alguns ambientes (XAMPP/MariaDB antigos) falham com CHECK.
+-- Forca valor nao negativo via tipo UNSIGNED.
+UPDATE Estoque_Filamento
+SET peso_atual_gramas = 0
+WHERE peso_atual_gramas < 0;
+
+ALTER TABLE Estoque_Filamento
+MODIFY COLUMN peso_atual_gramas DECIMAL(10,2) UNSIGNED NOT NULL;
 -- Ajustes para a interface OctoView
 ALTER TABLE Estoque_Filamento
 ADD COLUMN cor_hex VARCHAR(7) DEFAULT '#888888';

@@ -26,6 +26,13 @@ try {
             respond(['ok' => true, 'data' => forgot_password($db, $input)]);
             break;
 
+        case 'change-password':
+            ensure_method($method, 'POST');
+            $auth = require_auth($db);
+            change_password($db, $auth, $input);
+            respond(['ok' => true, 'data' => ['updated' => true]]);
+            break;
+
         case 'bootstrap':
             $auth = require_auth($db);
             respond(['ok' => true, 'data' => bootstrap_payload($db, $auth)]);
@@ -88,6 +95,19 @@ try {
                 'ok' => true,
                 'data' => [
                     'created' => $created,
+                    'bootstrap' => bootstrap_payload($db, require_auth($db)),
+                ],
+            ]);
+            break;
+
+        case 'unit-create':
+            ensure_method($method, 'POST');
+            $auth = require_admin($db);
+            $unit = create_unit($db, $auth, $input);
+            respond([
+                'ok' => true,
+                'data' => [
+                    'unit' => $unit,
                     'bootstrap' => bootstrap_payload($db, require_auth($db)),
                 ],
             ]);
@@ -189,6 +209,7 @@ function login_user(mysqli $db, array $input): array
         'token' => create_jwt($user),
         'user' => $user,
         'expiresIn' => OCTOVIEW_JWT_TTL,
+        'senhaTemporaria' => is_temporary_password_hash((string) $row['senha_hash']),
     ];
 }
 
@@ -228,6 +249,44 @@ function forgot_password(mysqli $db, array $input): array
         'usuario' => $row['usuario'],
         'senhaTemporaria' => '1234',
     ];
+}
+
+function change_password(mysqli $db, array $authUser, array $input): void
+{
+    ensure_auth_columns($db);
+
+    $current = (string) ($input['senhaAtual'] ?? '');
+    $next = trim((string) ($input['novaSenha'] ?? ''));
+    if ($next === '' || strlen($next) < 4) {
+        throw new InvalidArgumentException('A nova senha deve ter ao menos 4 caracteres.');
+    }
+
+    $stmt = $db->prepare('SELECT senha_hash FROM Solicitante WHERE id = ? LIMIT 1');
+    $userId = (int) ($authUser['id'] ?? 0);
+    $stmt->bind_param('i', $userId);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+    $currentHash = (string) ($row['senha_hash'] ?? '');
+    if ($currentHash === '') {
+        throw new RuntimeException('Senha atual nao encontrada para o usuario.');
+    }
+
+    if (!password_verify($current, $currentHash)) {
+        throw http_error('Senha atual incorreta.', 401);
+    }
+
+    if (password_verify($next, $currentHash)) {
+        throw new InvalidArgumentException('A nova senha deve ser diferente da senha atual.');
+    }
+
+    $nextHash = password_hash($next, PASSWORD_DEFAULT);
+    if ($nextHash === false) {
+        throw new RuntimeException('Nao foi possivel gerar a nova senha.');
+    }
+
+    $stmt = $db->prepare('UPDATE Solicitante SET senha_hash = ? WHERE id = ?');
+    $stmt->bind_param('si', $nextHash, $userId);
+    $stmt->execute();
 }
 
 function require_auth(mysqli $db): array
@@ -295,6 +354,15 @@ function create_jwt(array $user): string
     $signature = hash_hmac('sha256', $encodedHeader . '.' . $encodedPayload, jwt_secret(), true);
 
     return $encodedHeader . '.' . $encodedPayload . '.' . jwt_b64_encode($signature);
+}
+
+function is_temporary_password_hash(string $hash): bool
+{
+    if ($hash === '') {
+        return false;
+    }
+
+    return password_verify('1234', $hash);
 }
 
 function decode_jwt(string $token): array
@@ -454,6 +522,60 @@ function fetch_units(mysqli $db): array
     }
 
     return $items;
+}
+
+function create_unit(mysqli $db, array $authUser, array $input): array
+{
+    if (!user_has_global_scope($authUser)) {
+        throw http_error('Somente administradores nacionais podem cadastrar unidades.', 403);
+    }
+    if (!table_exists($db, 'Unidade')) {
+        throw new RuntimeException('Tabela Unidade nao encontrada. Execute a migracao de multi-unidades.', 500);
+    }
+
+    $cidade = trim((string) ($input['cidade'] ?? ''));
+    $estado = strtoupper(trim((string) ($input['estado'] ?? '')));
+    $codigo = strtoupper(trim((string) ($input['codigo'] ?? '')));
+    $nome = trim((string) ($input['nome'] ?? ''));
+
+    if ($cidade === '' || $estado === '' || $codigo === '') {
+        throw new InvalidArgumentException('Informe cidade, estado e codigo da unidade.');
+    }
+    if (!preg_match('/^[A-Z]{2}$/', $estado)) {
+        throw new InvalidArgumentException('Estado invalido. Use a sigla com 2 letras (ex: PR).');
+    }
+    if (strlen($codigo) < 3) {
+        throw new InvalidArgumentException('Codigo da unidade invalido.');
+    }
+    if ($nome === '') {
+        $nome = 'Unidade ' . $codigo;
+    }
+
+    $stmt = $db->prepare('SELECT id, nome_unidade, cidade, estado, codigo_senac FROM Unidade WHERE codigo_senac = ? LIMIT 1');
+    $stmt->bind_param('s', $codigo);
+    $stmt->execute();
+    $existing = $stmt->get_result()->fetch_assoc();
+    if ($existing) {
+        return [
+            'id' => (int) $existing['id'],
+            'nome' => $existing['nome_unidade'],
+            'cidade' => $existing['cidade'],
+            'estado' => $existing['estado'],
+            'codigo' => $existing['codigo_senac'],
+        ];
+    }
+
+    $stmt = $db->prepare('INSERT INTO Unidade (nome_unidade, cidade, estado, codigo_senac) VALUES (?, ?, ?, ?)');
+    $stmt->bind_param('ssss', $nome, $cidade, $estado, $codigo);
+    $stmt->execute();
+
+    return [
+        'id' => (int) $db->insert_id,
+        'nome' => $nome,
+        'cidade' => $cidade,
+        'estado' => $estado,
+        'codigo' => $codigo,
+    ];
 }
 
 function fetch_filaments(mysqli $db, array $authUser): array
@@ -907,7 +1029,7 @@ function create_user(mysqli $db, array $input): array
     $setorId = (int) ($input['setorId'] ?? 0);
     $tipo = (($input['tipo'] ?? 'comum') === 'admin') ? 'admin' : 'comum';
     $perfil = normalize_access_profile((string) ($input['perfil'] ?? ''), $tipo);
-    $unitId = isset($input['unitId']) ? (int) $input['unitId'] : require_user_unit_id($authUser);
+    $unitId = resolve_user_unit_id($db, $authUser, $input);
 
     if ($nome === '' || $email === '' || $usuario === '' || $matricula === '' || $setorId <= 0) {
         throw new InvalidArgumentException('Preencha nome, email, usuario, matricula e setor.');
@@ -915,10 +1037,6 @@ function create_user(mysqli $db, array $input): array
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         throw new InvalidArgumentException('Informe um email valido.');
-    }
-
-    if (!user_can_manage_unit($authUser, $unitId)) {
-        throw http_error('Voce nao pode cadastrar usuarios para outra unidade.', 403);
     }
 
     $stmt = $db->prepare('SELECT id FROM Setor WHERE id = ?');
@@ -952,13 +1070,48 @@ function create_user(mysqli $db, array $input): array
         'id' => (int) $db->insert_id,
         'usuario' => $usuario,
         'senhaPadrao' => $passwordPreview,
-        'regraSenha' => 'matricula',
+        'regraSenha' => '1234',
     ];
 }
 
 function default_password(string $nome, string $matricula): string
 {
-    return $matricula;
+    return '1234';
+}
+
+function resolve_user_unit_id(mysqli $db, array $authUser, array $input, ?int $fallbackUnitId = null): int
+{
+    $unitId = isset($input['unitId']) ? (int) ($input['unitId']) : 0;
+    $unitCidade = trim((string) ($input['unitCidade'] ?? ''));
+    $unitEstado = strtoupper(trim((string) ($input['unitEstado'] ?? '')));
+    $unitCodigo = strtoupper(trim((string) ($input['unitCodigo'] ?? '')));
+    $hasUnitForm = $unitCidade !== '' || $unitEstado !== '' || $unitCodigo !== '';
+
+    if ($hasUnitForm) {
+        if (!user_has_global_scope($authUser)) {
+            throw http_error('Somente administradores nacionais podem cadastrar novas unidades.', 403);
+        }
+        if ($unitCidade === '' || $unitEstado === '' || $unitCodigo === '') {
+            throw new InvalidArgumentException('Preencha cidade, estado e codigo da unidade.');
+        }
+
+        $createdUnit = create_unit($db, $authUser, [
+            'cidade' => $unitCidade,
+            'estado' => $unitEstado,
+            'codigo' => $unitCodigo,
+        ]);
+        return (int) ($createdUnit['id'] ?? 0);
+    }
+
+    if ($unitId <= 0) {
+        $unitId = $fallbackUnitId !== null ? $fallbackUnitId : require_user_unit_id($authUser);
+    }
+
+    if (!user_can_manage_unit($authUser, $unitId)) {
+        throw http_error('Voce nao pode gerenciar usuarios para outra unidade.', 403);
+    }
+
+    return $unitId;
 }
 
 function update_user(mysqli $db, array $input): void
@@ -972,14 +1125,10 @@ function update_user(mysqli $db, array $input): void
     $setorId = (int) ($input['setorId'] ?? 0);
     $tipo = (($input['tipo'] ?? 'comum') === 'admin') ? 'admin' : 'comum';
     $perfil = normalize_access_profile((string) ($input['perfil'] ?? ''), $tipo);
-    $unitId = isset($input['unitId']) ? (int) $input['unitId'] : require_user_unit_id($authUser);
+    $unitId = resolve_user_unit_id($db, $authUser, $input, require_user_unit_id($authUser));
 
     if ($id <= 0 || $nome === '' || $email === '' || $usuario === '' || $matricula === '' || $setorId <= 0) {
         throw new InvalidArgumentException('Preencha os dados do usuario corretamente.');
-    }
-
-    if (!user_can_manage_unit($authUser, $unitId)) {
-        throw http_error('Voce nao pode alterar usuarios de outra unidade.', 403);
     }
 
     $stmt = scoped_prepare($db, 'SELECT id FROM Solicitante WHERE id = ?' . scope_where_clause('unit_id', $authUser, true), 'unit_id', $authUser, 'i', [$id]);
