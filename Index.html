@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OctoView - Gestao de Impressao 3D</title>
+<title>Octopus - Gestão de Impressão 3D</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -13,54 +13,103 @@
 <div id="ld" aria-hidden="true">
   <div class="ld-logo">
     <div class="ld-mark">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 22 8 22 16 12 22 2 16 2 8"></polygon><circle cx="12" cy="12" r="3"></circle></svg>
+      <img src="logooctoview.png" data-logo-src="logooctoview.png" alt="Logo Octopus" class="brand-logo">
     </div>
-    <span class="ld-name">Octo<b>View</b></span>
   </div>
   <div class="ld-track"><div class="ld-bar"></div></div>
-  <p class="ld-sub">Gestao de Impressao 3D · SENAC</p>
+  <p class="ld-sub">Gestão de Impressão 3D · SENAC</p>
 </div>
 
 <section id="lsc" aria-labelledby="login-title">
   <div class="theme-floating">
-    <button id="theme-toggle-login" class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="Alternar tema">Tema</button>
+    <button id="theme-toggle-login" class="theme-toggle theme-toggle-icon" type="button" onclick="toggleTheme()" aria-label="Alternar tema" title="Alternar tema">
+      <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+        <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path>
+      </svg>
+      <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2.5M12 19.5V22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M2 12h2.5M19.5 12H22M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"></path>
+      </svg>
+    </button>
   </div>
   <div class="lc auth-card">
     <div class="lc-logo">
-      <div class="lc-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 22 8 22 16 12 22 2 16 2 8"></polygon><circle cx="12" cy="12" r="3"></circle></svg></div>
-      <span class="lc-name">Octo<b>View</b></span>
+      <div class="lc-mark lc-mark-stage">
+        <video class="brand-video" autoplay muted loop playsinline preload="metadata" poster="logooctoview.png" aria-label="Logotipo animado Octopus">
+          <source src="logovideo.mp4" type="video/mp4">
+          <img src="logooctoview.png" data-logo-src="logooctoview.png" alt="Logo Octopus" class="brand-logo">
+        </video>
+      </div>
     </div>
-    <p class="lc-sub">Gestao inteligente de impressao 3D com autenticacao segura</p>
-    <form class="login-form" onsubmit="doLogin(event)">
-      <div class="fg2 full">
-        <label class="fl" for="login-user">Usuario</label>
-        <input class="fin" id="login-user" autocomplete="username" placeholder="Digite o usuario, email ou matricula" required>
-      </div>
-      <div class="fg2 full">
-        <label class="fl" for="login-pass">Senha</label>
-        <input class="fin" id="login-pass" type="password" autocomplete="current-password" placeholder="Digite sua senha" required>
-      </div>
-      <p id="login-title" class="assistive-copy">Entre com seu usuario cadastrado. A senha inicial padrao e formada por sobrenome + matricula.</p>
-      <button class="login-link" type="button" onclick="submitForgotPassword()">Esqueceu a senha?</button>
-      <button class="lbtn" type="submit">Entrar no sistema</button>
-    </form>
+    <h1 id="login-title" class="lc-title">Octopus</h1>
+    <p class="lc-sub">Gestao de impressao 3D com autenticacao segura.</p>
+    <div class="login-panel">
+      <form class="login-form" onsubmit="doLogin(event)">
+        <div class="fg2 full">
+          <label class="fl" for="login-user">Usuario</label>
+          <input class="fin login-fin" id="login-user" autocomplete="username" placeholder="Digite o usuario, email ou matricula" required>
+        </div>
+        <div class="fg2 full">
+          <label class="fl" for="login-pass">Senha</label>
+          <div class="login-input-wrap">
+            <input class="fin login-fin login-pass-field" id="login-pass" type="password" autocomplete="current-password" placeholder="Digite sua senha" required>
+            <button class="login-password-toggle" type="button" onclick="toggleLoginPassword()" aria-label="Mostrar senha" aria-pressed="false">
+              <svg class="icon-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <svg class="icon-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                <path d="M3 3l18 18"></path>
+                <path d="M10.6 10.7a3 3 0 0 0 4.2 4.2"></path>
+                <path d="M9.9 5.2A10.5 10.5 0 0 1 12 5c6.5 0 10 7 10 7a17.2 17.2 0 0 1-3 3.8"></path>
+                <path d="M6.2 6.3A17.7 17.7 0 0 0 2 12s3.5 7 10 7a9.8 9.8 0 0 0 4.2-.9"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="login-meta-row">
+          <p class="assistive-copy">Use seu e-mail para acessar.</p>
+          <button class="login-link" type="button" onclick="submitForgotPassword()">Esqueceu a senha?</button>
+        </div>
+        <button class="lbtn" type="submit">Entrar no sistema</button>
+      </form>
+    </div>
   </div>
 </section>
 
 <div id="app" aria-hidden="true">
-  <aside class="sb">
+  <button id="menu-toggle" class="menu-toggle" type="button" onclick="toggleMobileMenu()" aria-label="Abrir menu de navegacao" aria-controls="sidebar-panel" aria-expanded="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </button>
+  <div class="mobile-menu-overlay" onclick="closeMobileMenu()" aria-hidden="true"></div>
+  <aside class="sb" id="sidebar-panel">
     <div class="sb-logo">
-      <div class="sb-mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 22 8 22 16 12 22 2 16 2 8"></polygon><circle cx="12" cy="12" r="3"></circle></svg></div>
-      <span class="sb-nm">Octo<b>View</b></span>
+      <button id="theme-toggle-app" class="theme-toggle theme-toggle-icon theme-toggle-app sb-theme-top" type="button" onclick="toggleTheme()" aria-label="Alternar tema" title="Alternar tema">
+        <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path>
+        </svg>
+        <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2.5M12 19.5V22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M2 12h2.5M19.5 12H22M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"></path>
+        </svg>
+      </button>
+      <div class="sb-brand">
+        <img src="logoestatico.png" alt="Logo Octopus" class="brand-logo sb-static-logo">
+        <p class="sb-brand-sub">Gestão Octopus </p>
+      </div>
     </div>
     <div class="sb-user">
       <div class="sb-av" id="sb-av">O</div>
-      <div>
+      <div class="sb-user-meta">
         <div class="sb-un" id="sb-nm">-</div>
         <div class="sb-ur"><span class="rpill admin" id="sb-role">Admin</span></div>
+        <button class="sb-photo-btn" type="button" onclick="openProfilePhotoModal()">Alterar foto de perfil</button>
       </div>
     </div>
-    <button class="sb-photo-btn" type="button" onclick="openProfilePhotoModal()">Alterar foto de perfil</button>
     <nav class="sb-nav" aria-label="Navegacao principal">
       <div class="nav-sec adm">Administracao</div>
       <button class="ni adm" type="button" data-section="dashboard" onclick="go('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>Dashboard<div class="dot"></div></button>
@@ -75,7 +124,6 @@
       <button class="ni" type="button" data-section="meus-pedidos" onclick="go('meus-pedidos')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><path d="M14 2v6h6"></path><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Meus Pedidos<div class="dot"></div></button>
     </nav>
     <div class="sb-ft">
-      <button id="theme-toggle-app" class="theme-toggle theme-toggle-app" type="button" onclick="toggleTheme()">Alternar tema</button>
       <button class="lout" type="button" onclick="doLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sair da conta</button>
     </div>
   </aside>
@@ -315,6 +363,11 @@
     <div class="vw-plugin-top-wrapper"></div>
   </div>
 </div>
+<script>
+  document.querySelectorAll('img[data-logo-src]').forEach((img) => {
+    img.src = `${img.dataset.logoSrc}?v=${Date.now()}`;
+  });
+</script>
 <script src="app.js" defer></script>
 <script>
   (function(){
@@ -324,7 +377,7 @@
       const now=new Date();
       const dateLabel=now.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'});
       const timeLabel=now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-      dateNode.textContent=`${dateLabel} · ${timeLabel}`;
+      dateNode.textContent=`${dateLabel} Â· ${timeLabel}`;
     }
 
     function getScopeLabel(){
