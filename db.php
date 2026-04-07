@@ -15,7 +15,7 @@ function octoview_db(): mysqli
     $host = getenv('OCTOVIEW_DB_HOST') ?: 'localhost';
     $user = getenv('OCTOVIEW_DB_USER') ?: 'root';
     $pass = getenv('OCTOVIEW_DB_PASS') ?: '';
-    $preferred = getenv('OCTOVIEW_DB_NAME') ?: 'sistema_impressao3d';
+    $preferred = getenv('OCTOVIEW_DB_NAME') ?:   'sistema_impressao3d';
     $candidates = array_values(array_unique([$preferred, 'Sistema_impressao3d', 'impressao3d']));
 
     $lastError = null;

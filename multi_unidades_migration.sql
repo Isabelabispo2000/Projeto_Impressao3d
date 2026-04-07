@@ -10,8 +10,10 @@ CREATE TABLE IF NOT EXISTS Unidade (
     cidade VARCHAR(120) NOT NULL,
     estado CHAR(2) NOT NULL,
     codigo_senac VARCHAR(30) NOT NULL,
+    public_token CHAR(24) NULL,
     criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uq_unidade_codigo_senac UNIQUE (codigo_senac)
+    CONSTRAINT uq_unidade_codigo_senac UNIQUE (codigo_senac),
+    CONSTRAINT uq_unidade_public_token UNIQUE (public_token)
 );
 
 INSERT INTO Unidade (nome_unidade, cidade, estado, codigo_senac)
@@ -139,5 +141,9 @@ SET escopo_acesso = CASE
     ELSE 'colaborador'
 END
 WHERE escopo_acesso NOT IN ('admin_local', 'admin_nacional', 'colaborador');
+
+UPDATE Unidade
+SET public_token = LOWER(SUBSTRING(REPLACE(UUID(), '-', ''), 1, 24))
+WHERE public_token IS NULL OR public_token = '';
 
 COMMIT;

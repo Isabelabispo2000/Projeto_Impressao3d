@@ -1,0 +1,9 @@
+RewriteEngine On
+
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+RewriteRule ^unidades/?$ unidades.php [L,QSA,NC]
+RewriteRule ^unidade/([0-9]+)/?$ unidade.php?id=$1 [L,QSA,NC]
+RewriteRule ^unidade/([A-Za-z0-9]+)/pedidos/?$ unidade-pedidos.php?token=$1 [L,QSA,NC]
+RewriteRule ^unidade/([A-Za-z0-9]+)/?$ unidade.php?token=$1 [L,QSA,NC]

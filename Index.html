@@ -13,7 +13,7 @@
 <div id="ld" aria-hidden="true">
   <div class="ld-logo">
     <div class="ld-mark">
-      <img src="logooctoview.png" data-logo-src="logooctoview.png" alt="Logo Octopus" class="brand-logo">
+      <img src="logoocto.png" data-logo-src="logoocto.png" alt="Logo Octopus" class="brand-logo">
     </div>
   </div>
   <div class="ld-track"><div class="ld-bar"></div></div>
@@ -33,17 +33,17 @@
     </button>
   </div>
   <div class="lc auth-card">
-    <div class="lc-logo">
-      <div class="lc-mark lc-mark-stage">
-        <video class="brand-video" autoplay muted loop playsinline preload="metadata" poster="logooctoview.png" aria-label="Logotipo animado Octopus">
-          <source src="logovideo.mp4" type="video/mp4">
-          <img src="logooctoview.png" data-logo-src="logooctoview.png" alt="Logo Octopus" class="brand-logo">
-        </video>
-      </div>
-    </div>
-    <h1 id="login-title" class="lc-title">Octopus</h1>
-    <p class="lc-sub">Gestao de impressao 3D com autenticacao segura.</p>
     <div class="login-panel">
+      <div class="lc-logo">
+        <div class="lc-mark lc-mark-stage">
+          <video class="brand-video" autoplay muted loop playsinline preload="metadata" poster="logoocto.png" aria-label="Logotipo animado Octopus">
+            <source src="logovideo.mp4" type="video/mp4">
+            <img src="logoocto.png" data-logo-src="logoocto.png" alt="Logo Octopus" class="brand-logo">
+          </video>
+        </div>
+      </div>
+      <h1 id="login-title" class="lc-title">Octopus</h1>
+      <p class="lc-sub">Gestao de impressao 3D com autenticacao segura.</p>
       <form class="login-form" onsubmit="doLogin(event)">
         <div class="fg2 full">
           <label class="fl" for="login-user">Usuario</label>
@@ -71,6 +71,7 @@
           <p class="assistive-copy">Use seu e-mail para acessar.</p>
           <button class="login-link" type="button" onclick="submitForgotPassword()">Esqueceu a senha?</button>
         </div>
+        <a class="login-direct-link" href="unidades.php">Acessar pagina publica de unidades</a>
         <button class="lbtn" type="submit">Entrar no sistema</button>
       </form>
     </div>
@@ -102,33 +103,46 @@
         <p class="sb-brand-sub">Gestão Octopus </p>
       </div>
     </div>
-    <div class="sb-user">
-      <div class="sb-av" id="sb-av">O</div>
-      <div class="sb-user-meta">
-        <div class="sb-un" id="sb-nm">-</div>
-        <div class="sb-ur"><span class="rpill admin" id="sb-role">Admin</span></div>
-        <button class="sb-photo-btn" type="button" onclick="openProfilePhotoModal()">Alterar foto de perfil</button>
-      </div>
+    <div class="sb-main">
+      <nav class="sb-nav" aria-label="Navegacao principal">
+        <div class="nav-sec adm">Administracao</div>
+        <button class="ni adm" type="button" data-section="dashboard" onclick="go('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>Dashboard<div class="dot"></div></button>
+        <button class="ni" type="button" data-section="pedidos-admin" onclick="go('pedidos-admin')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>Fila de Pedidos<div class="dot"></div></button>
+        <button class="ni adm" type="button" data-section="estoque" onclick="go('estoque')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8"></path><line x1="12" y1="12" x2="12" y2="22"></line><line x1="3.27" y1="6.96" x2="12" y2="12"></line><line x1="20.73" y1="6.96" x2="12" y2="12"></line></svg>Estoque<div class="dot"></div></button>
+        <button class="ni adm" type="button" data-section="galeria-admin" onclick="go('galeria-admin')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>Galeria - Gestao<div class="dot"></div></button>
+        <button class="ni adm" type="button" data-section="usuarios" onclick="go('usuarios')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 00-3-3.87"></path><path d="M16 3.13a4 4 0 010 7.75"></path></svg>Usuarios<div class="dot"></div></button>
+        <button class="ni adm national-only" type="button" data-section="unidades" onclick="go('unidades')" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 9h6"></path><path d="M9 13h6"></path></svg>Unidades<div class="dot"></div></button>
+        <div class="nav-sec">Solicitante</div>
+        <button class="ni" type="button" data-section="galeria" onclick="go('galeria')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>Galeria de Modelos<div class="dot"></div></button>
+        <button class="ni" type="button" data-section="novo-pedido" onclick="go('novo-pedido')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>Novo Pedido<div class="dot"></div></button>
+        <button class="ni" type="button" data-section="meus-pedidos" onclick="go('meus-pedidos')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><path d="M14 2v6h6"></path><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Meus Pedidos<div class="dot"></div></button>
+      </nav>
     </div>
-    <nav class="sb-nav" aria-label="Navegacao principal">
-      <div class="nav-sec adm">Administracao</div>
-      <button class="ni adm" type="button" data-section="dashboard" onclick="go('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>Dashboard<div class="dot"></div></button>
-      <button class="ni" type="button" data-section="pedidos-admin" onclick="go('pedidos-admin')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>Fila de Pedidos<div class="dot"></div></button>
-      <button class="ni adm" type="button" data-section="estoque" onclick="go('estoque')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8"></path><line x1="12" y1="12" x2="12" y2="22"></line><line x1="3.27" y1="6.96" x2="12" y2="12"></line><line x1="20.73" y1="6.96" x2="12" y2="12"></line></svg>Estoque<div class="dot"></div></button>
-      <button class="ni adm" type="button" data-section="galeria-admin" onclick="go('galeria-admin')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>Galeria - Gestao<div class="dot"></div></button>
-      <button class="ni adm" type="button" data-section="usuarios" onclick="go('usuarios')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 00-3-3.87"></path><path d="M16 3.13a4 4 0 010 7.75"></path></svg>Usuarios<div class="dot"></div></button>
-      <button class="ni adm national-only" type="button" data-section="unidades" onclick="go('unidades')" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 9h6"></path><path d="M9 13h6"></path></svg>Unidades<div class="dot"></div></button>
-      <div class="nav-sec">Solicitante</div>
-      <button class="ni" type="button" data-section="galeria" onclick="go('galeria')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>Galeria de Modelos<div class="dot"></div></button>
-      <button class="ni" type="button" data-section="novo-pedido" onclick="go('novo-pedido')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>Novo Pedido<div class="dot"></div></button>
-      <button class="ni" type="button" data-section="meus-pedidos" onclick="go('meus-pedidos')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><path d="M14 2v6h6"></path><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Meus Pedidos<div class="dot"></div></button>
-    </nav>
-    <div class="sb-ft">
-      <button class="lout" type="button" onclick="doLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sair da conta</button>
+    <div class="sb-bottom">
+      <div class="sb-user">
+        <div class="sb-av" id="sb-av">O</div>
+        <div class="sb-user-meta">
+          <div class="sb-un" id="sb-nm">-</div>
+          <div class="sb-ur"><span class="rpill admin" id="sb-role">Admin</span></div>
+          <button class="sb-photo-btn" type="button" onclick="openProfilePhotoModal()">Alterar foto de perfil</button>
+        </div>
+      </div>
+      <div class="sb-ft">
+        <button class="lout" type="button" onclick="doLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>Sair da conta</button>
+      </div>
     </div>
   </aside>
 
   <main class="main" id="main-content" tabindex="-1">
+    <div class="topbar" aria-label="Barra de acessos">
+      <div class="tb-t">Painel</div>
+      <div class="tb-r">
+        <button id="theme-toggle-topbar" class="theme-toggle theme-toggle-icon theme-toggle-app topbar-theme-toggle" type="button" onclick="toggleTheme()" aria-label="Alternar tema" title="Alternar tema">
+          <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path></svg>
+          <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2.5M12 19.5V22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M2 12h2.5M19.5 12H22M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"></path></svg>
+        </button>
+      </div>
+    </div>
     <div class="page">
       <div class="sec" id="sec-dashboard">
         <div class="sh dashboard-head">
@@ -150,19 +164,19 @@
           </div>
         </div>
         <div class="sg">
-          <div class="sc"><div class="sci b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"></path><rect x="9" y="3" width="6" height="4" rx="1"></rect></svg></div><div class="sv" id="stat-pedidos">0</div><div class="sl">Pedidos Ativos</div><div class="sd" id="stat-pedidos-det">Sem movimentacao recente</div></div>
-          <div class="sc"><div class="sci y"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8"></path></svg></div><div class="sv" id="stat-estoque">0</div><div class="sl">Rolos em Estoque</div><div class="sd w" id="stat-estoque-det">Nenhum alerta</div></div>
-          <div class="sc"><div class="sci g"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="sv" id="stat-concluidos">0</div><div class="sl">Concluidos</div><div class="sd" id="stat-concluidos-det">Historico do sistema</div></div>
-          <div class="sc"><div class="sci p"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 00-3-3.87"></path><path d="M16 3.13a4 4 0 010 7.75"></path></svg></div><div class="sv" id="stat-solicitantes">0</div><div class="sl">Solicitantes</div><div class="sd" id="stat-solicitantes-det">0 setores ativos</div></div>
+          <div class="sc"><div class="sci b"><i data-lucide="printer"></i></div><div class="sv" id="stat-pedidos">0</div><div class="sl">Pedidos Ativos</div><div class="sd" id="stat-pedidos-det">Sem movimentacao recente</div></div>
+          <div class="sc"><div class="sci y"><i data-lucide="cylinder"></i></div><div class="sv" id="stat-estoque">0</div><div class="sl">Rolos em Estoque</div><div class="sd w" id="stat-estoque-det">Nenhum alerta</div></div>
+          <div class="sc"><div class="sci g"><i data-lucide="badge-check"></i></div><div class="sv" id="stat-concluidos">0</div><div class="sl">Concluidos</div><div class="sd" id="stat-concluidos-det">Historico do sistema</div></div>
+          <div class="sc"><div class="sci p"><i data-lucide="users-round"></i></div><div class="sv" id="stat-solicitantes">0</div><div class="sl">Solicitantes</div><div class="sd" id="stat-solicitantes-det">0 setores ativos</div></div>
         </div>
         <div class="al w" id="dash-alert" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg><span id="dash-alert-text"></span></div>
         <div class="dg">
           <div class="g">
-            <div class="ch"><div><div class="ct">Fila Prioritaria</div><div class="cs">Ordenada por setor e data</div></div><button class="btn bg bsm" type="button" onclick="go('pedidos-admin')">Ver tudo</button></div>
+            <div class="ch dashboard-card-head"><div class="dashboard-card-head-copy"><div class="ct">Fila Prioritaria</div><div class="cs">Ordenada por setor e data</div></div><button class="btn bg bsm" type="button" onclick="go('pedidos-admin')">Ver tudo</button></div>
             <div id="fila-prev"></div>
           </div>
           <div class="g">
-            <div class="ch"><div class="ct">Status dos Pedidos</div></div>
+            <div class="ch dashboard-card-head dashboard-card-head-compact"><div class="dashboard-card-head-copy"><div class="ct">Status dos Pedidos</div><div class="cs dashboard-card-head-spacer" aria-hidden="true">&nbsp;</div></div></div>
             <div class="dw">
               <div class="dp">
                 <div id="donut-chart"></div>
@@ -173,7 +187,7 @@
           </div>
         </div>
         <div class="g" style="margin-top:16px">
-          <div class="ch"><div><div class="ct">Pedidos por Instrutor</div><div class="cs">Quantidade total de solicitacoes por instrutor</div></div></div>
+          <div class="ch"><div><div class="ct">Pedidos por Instrutor</div><div class="cs">Quantidade total de solicitações por instrutor</div></div></div>
           <div class="chart-wrap" id="instr-chart"></div>
         </div>
         <div class="g" style="margin-top:16px">
@@ -257,7 +271,7 @@
                 <div class="fg2"><label class="fl" for="np-fil">Filamento</label><select class="fin" id="np-fil"></select></div>
                 <div class="fg2 full"><label class="fl" for="np-fin">Finalidade *</label><input class="fin" id="np-fin" placeholder="Ex: Brinde institucional, peca de laboratorio..."></div>
                 <div class="fg2"><label class="fl" for="np-data">Data Limite</label><input type="date" class="fin" id="np-data"></div>
-                <div class="fg2"><label class="fl" for="np-obs">Observacoes</label><input class="fin" id="np-obs" placeholder="Detalhes adicionais..."></div>
+                <div class="fg2"><label class="fl" for="np-obs">Observações</label><input class="fin" id="np-obs" placeholder="Detalhes adicionais..."></div>
                 <div class="fg2 full"><label class="fl">Imagem de Referencia</label><div class="uz" onclick="document.getElementById('np-file').click()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><p><span>Clique para enviar</span> ou arraste aqui</p><p style="font-size:0.7rem;margin-top:3px;color:var(--tx3)">PNG, JPG ate 5MB</p><img id="np-prev" class="up" alt="Preview do pedido"></div><input type="file" id="np-file" accept="image/*" style="display:none" onchange="prevImg(this,'np-prev')"></div>
               </div>
               <div class="fa"><button class="btn bg" type="button" onclick="resetNP()">Limpar</button><button class="btn bp" type="button" onclick="submitPed()">Enviar Pedido</button></div>
@@ -267,7 +281,7 @@
       </div>
 
       <div class="sec" id="sec-meus-pedidos">
-        <div class="sh"><div><h1>Meus Pedidos</h1><p>Acompanhe o andamento das suas solicitacoes</p></div></div>
+        <div class="sh"><div><h1>Meus Pedidos</h1><p>Acompanhe o andamento das suas solicitações</p></div></div>
         <div id="my-list" style="display:flex;flex-direction:column;gap:13px"></div>
       </div>
     </div>
@@ -337,15 +351,30 @@
 <div class="mo" id="mphoto"><div class="md" style="width:430px">
   <div class="mh"><span class="mt">Foto de Perfil</span><button class="mx" type="button" onclick="closeM('mphoto')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>
   <div class="mb">
-    <div class="fg2 full"><label class="fl">Nova Foto</label><div class="uz" onclick="document.getElementById('photo-file').click()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><p><span>Clique para enviar</span></p><img id="photo-prev" class="up" alt="Preview da foto de perfil"></div><input type="file" id="photo-file" accept="image/*" style="display:none" onchange="prevImg(this,'photo-prev')"></div>
-    <div class="fa"><button class="btn bg" type="button" onclick="closeM('mphoto')">Cancelar</button><button class="btn bp" type="button" onclick="saveProfilePhoto()">Salvar Foto</button></div>
+    <div class="fg2 full">
+      <div class="profile-photo-dropzone uz" onclick="document.getElementById('photo-file').click()">
+        <div class="profile-photo-empty" id="photo-empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 16V7"></path><path d="M8.5 10.5 12 7l3.5 3.5"></path><path d="M20 16.5v1a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2v-1"></path></svg>
+          <p><span>Adicionar ou alterar foto</span></p>
+        </div>
+        <div class="profile-photo-preview-wrap" id="photo-preview-wrap">
+          <button class="profile-photo-clear" id="photo-clear-btn" type="button" onclick="clearProfilePhotoSelection(event)" aria-label="Remover foto selecionada">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M18 6 6 18"></path><path d="M6 6l12 12"></path></svg>
+          </button>
+          <img id="photo-prev" class="profile-photo-preview" alt="Preview da foto de perfil">
+          <p class="profile-photo-caption">Toque para alterar</p>
+        </div>
+      </div>
+      <input type="file" id="photo-file" accept="image/*" style="display:none" onchange="prevImg(this,'photo-prev')">
+    </div>
+    <div class="fa profile-photo-actions"><button class="btn bg" type="button" onclick="closeM('mphoto')">Cancelar</button><button class="btn bp" type="button" onclick="saveProfilePhoto()">Salvar Foto</button></div>
   </div>
 </div></div>
 
 <div class="mo" id="mp"><div class="md">
   <div class="mh"><span class="mt">Solicitar Impressao</span><button class="mx" type="button" onclick="closeM('mp')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>
   <div class="mb">
-    <div id="gal-info" style="padding:12px 14px;background:rgba(37,99,235,0.05);border:1px solid rgba(37,99,235,0.12);border-radius:var(--r);margin-bottom:16px;font-size:0.82rem;color:var(--tx)"></div>
+    <div id="gal-info" style="padding:12px 14px;background:rgba(226, 217, 217, 0.05);border:1px solid rgba(37,99,235,0.12);border-radius:var(--r);margin-bottom:16px;font-size:0.82rem;color:var(--tx)"></div>
     <div class="form-grid">
       <div class="fg2 full"><label class="fl" for="gal-fil">Filamento</label><select class="fin" id="gal-fil"></select></div>
       <div class="fg2 full"><label class="fl" for="gal-fin">Finalidade</label><input class="fin" id="gal-fin" placeholder="Ex: Uso em sala de aula"></div>
@@ -368,9 +397,16 @@
     img.src = `${img.dataset.logoSrc}?v=${Date.now()}`;
   });
 </script>
+<script src="https://unpkg.com/lucide@latest"></script>
 <script src="app.js" defer></script>
 <script>
   (function(){
+    function initLucideIcons(){
+      if(window.lucide&&typeof window.lucide.createIcons==='function'){
+        window.lucide.createIcons();
+      }
+    }
+
     function syncDashboardDateTime(){
       const dateNode=document.getElementById('tb-date');
       if(!dateNode)return;
@@ -433,6 +469,7 @@
     }
 
     document.addEventListener('DOMContentLoaded',function(){
+      initLucideIcons();
       syncDashboardDateTime();
       window.setInterval(syncDashboardDateTime,30000);
     });

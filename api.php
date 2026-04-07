@@ -38,6 +38,26 @@ try {
             respond(['ok' => true, 'data' => bootstrap_payload($db, $auth)]);
             break;
 
+        case 'public-unit-queue':
+            ensure_method($method, 'GET');
+            respond(['ok' => true, 'data' => fetch_public_unit_queue($db, (string) ($_GET['token'] ?? ''))]);
+            break;
+
+        case 'public-units':
+            ensure_method($method, 'GET');
+            respond(['ok' => true, 'data' => fetch_public_units($db)]);
+            break;
+
+        case 'public-unit-queue-id':
+            ensure_method($method, 'GET');
+            respond(['ok' => true, 'data' => fetch_public_unit_queue_by_id($db, (int) ($_GET['id'] ?? 0))]);
+            break;
+
+        case 'public-unit-orders':
+            ensure_method($method, 'GET');
+            respond(['ok' => true, 'data' => fetch_public_unit_orders($db, (string) ($_GET['token'] ?? ''))]);
+            break;
+
         case 'filament-save':
             ensure_method($method, 'POST');
             require_admin($db);
@@ -509,7 +529,9 @@ function fetch_units(mysqli $db): array
         return [];
     }
 
-    $result = $db->query('SELECT id, nome_unidade, cidade, estado, codigo_senac FROM Unidade ORDER BY nome_unidade');
+    ensure_public_unit_columns($db);
+
+    $result = $db->query('SELECT id, nome_unidade, cidade, estado, codigo_senac, public_token FROM Unidade ORDER BY nome_unidade');
     $items = [];
     while ($row = $result->fetch_assoc()) {
         $items[] = [
@@ -518,6 +540,8 @@ function fetch_units(mysqli $db): array
             'cidade' => $row['cidade'],
             'estado' => $row['estado'],
             'codigo' => $row['codigo_senac'],
+            'publicToken' => $row['public_token'] ?? null,
+            'publicPath' => !empty($row['public_token']) ? '/unidade/' . $row['public_token'] : null,
         ];
     }
 
@@ -532,6 +556,7 @@ function create_unit(mysqli $db, array $authUser, array $input): array
     if (!table_exists($db, 'Unidade')) {
         throw new RuntimeException('Tabela Unidade nao encontrada. Execute a migracao de multi-unidades.', 500);
     }
+    ensure_public_unit_columns($db);
 
     $cidade = trim((string) ($input['cidade'] ?? ''));
     $estado = strtoupper(trim((string) ($input['estado'] ?? '')));
@@ -551,7 +576,7 @@ function create_unit(mysqli $db, array $authUser, array $input): array
         $nome = 'Unidade ' . $codigo;
     }
 
-    $stmt = $db->prepare('SELECT id, nome_unidade, cidade, estado, codigo_senac FROM Unidade WHERE codigo_senac = ? LIMIT 1');
+    $stmt = $db->prepare('SELECT id, nome_unidade, cidade, estado, codigo_senac, public_token FROM Unidade WHERE codigo_senac = ? LIMIT 1');
     $stmt->bind_param('s', $codigo);
     $stmt->execute();
     $existing = $stmt->get_result()->fetch_assoc();
@@ -562,11 +587,14 @@ function create_unit(mysqli $db, array $authUser, array $input): array
             'cidade' => $existing['cidade'],
             'estado' => $existing['estado'],
             'codigo' => $existing['codigo_senac'],
+            'publicToken' => $existing['public_token'] ?? null,
+            'publicPath' => !empty($existing['public_token']) ? '/unidade/' . $existing['public_token'] : null,
         ];
     }
 
-    $stmt = $db->prepare('INSERT INTO Unidade (nome_unidade, cidade, estado, codigo_senac) VALUES (?, ?, ?, ?)');
-    $stmt->bind_param('ssss', $nome, $cidade, $estado, $codigo);
+    $publicToken = generate_public_unit_token();
+    $stmt = $db->prepare('INSERT INTO Unidade (nome_unidade, cidade, estado, codigo_senac, public_token) VALUES (?, ?, ?, ?, ?)');
+    $stmt->bind_param('sssss', $nome, $cidade, $estado, $codigo, $publicToken);
     $stmt->execute();
 
     return [
@@ -575,7 +603,308 @@ function create_unit(mysqli $db, array $authUser, array $input): array
         'cidade' => $cidade,
         'estado' => $estado,
         'codigo' => $codigo,
+        'publicToken' => $publicToken,
+        'publicPath' => '/unidade/' . $publicToken,
     ];
+}
+
+function fetch_public_unit_queue(mysqli $db, string $token): array
+{
+    ensure_public_unit_columns($db);
+
+    $unit = fetch_public_unit_by_token($db, $token);
+    if ($unit === null) {
+        throw http_error('Unidade nao encontrada.', 404);
+    }
+
+    $statuses = ['Pendente', 'Em Producao', 'Em Produção'];
+    $statusPlaceholders = implode(',', array_fill(0, count($statuses), '?'));
+    $sql = <<<SQL
+        SELECT
+            p.id,
+            p.status,
+            p.data_solicitacao,
+            s.nome AS solicitante_nome,
+            st.nivel_prioridade,
+            st.nome_setor,
+            gm.nome_modelo
+        FROM Pedido p
+        INNER JOIN Solicitante s ON s.id = p.solicitante_id
+        LEFT JOIN Setor st ON st.id = s.setor_id
+        LEFT JOIN Galeria_Modelos gm ON gm.id = p.modelo_id
+        WHERE p.unit_id = ?
+          AND p.status IN ($statusPlaceholders)
+        ORDER BY COALESCE(st.nivel_prioridade, 0) DESC, p.data_solicitacao ASC, p.id ASC
+    SQL;
+    $stmt = $db->prepare($sql);
+    $types = 'i' . str_repeat('s', count($statuses));
+    $params = array_merge([(int) $unit['id']], $statuses);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $queue = [];
+    $position = 1;
+    while ($row = $result->fetch_assoc()) {
+        $normalizedStatus = normalize_status((string) ($row['status'] ?? 'Pendente'));
+        $queue[] = [
+            'id' => (int) $row['id'],
+            'position' => $position++,
+            'instructorName' => $row['solicitante_nome'] ?? 'Instrutor nao informado',
+            'sector' => $row['nome_setor'] ?: 'Sem setor',
+            'modelName' => $row['nome_modelo'] ?: 'Modelo personalizado',
+            'status' => $normalizedStatus === 'Em Producao' ? 'Imprimindo' : 'Em Espera',
+            'statusKey' => $normalizedStatus === 'Em Producao' ? 'printing' : 'waiting',
+            'createdAt' => $row['data_solicitacao'] ?? null,
+        ];
+    }
+
+    return [
+        'unit' => [
+            'id' => (int) $unit['id'],
+            'name' => $unit['nome_unidade'],
+            'city' => $unit['cidade'],
+            'state' => $unit['estado'],
+            'code' => $unit['codigo_senac'],
+            'publicToken' => $unit['public_token'],
+        ],
+        'queue' => $queue,
+        'lastUpdatedAt' => gmdate('c'),
+        'refreshIntervalMs' => 15000,
+    ];
+}
+
+function fetch_public_units(mysqli $db): array
+{
+    ensure_public_unit_columns($db);
+
+    $sql = <<<SQL
+        SELECT
+            u.id,
+            u.nome_unidade,
+            u.cidade,
+            u.estado,
+            u.codigo_senac,
+            u.public_token,
+            (
+                SELECT COUNT(*)
+                FROM Pedido p
+                WHERE p.unit_id = u.id
+                  AND p.status NOT IN ('Concluido', 'Concluído')
+            ) AS active_orders
+        FROM Unidade u
+        ORDER BY u.nome_unidade ASC
+    SQL;
+    $result = $db->query($sql);
+
+    $items = [];
+    while ($row = $result->fetch_assoc()) {
+        $items[] = [
+            'id' => (int) $row['id'],
+            'name' => $row['nome_unidade'],
+            'city' => $row['cidade'],
+            'state' => $row['estado'],
+            'code' => $row['codigo_senac'],
+            'publicToken' => $row['public_token'] ?? null,
+            'activeOrders' => (int) ($row['active_orders'] ?? 0),
+            'queuePath' => '/unidade/' . (int) $row['id'],
+        ];
+    }
+
+    return [
+        'units' => $items,
+        'lastUpdatedAt' => gmdate('c'),
+        'refreshIntervalMs' => 15000,
+    ];
+}
+
+function fetch_public_unit_queue_by_id(mysqli $db, int $unitId): array
+{
+    ensure_public_unit_columns($db);
+
+    $unit = fetch_public_unit_by_id($db, $unitId);
+    if ($unit === null) {
+        throw http_error('Unidade nao encontrada.', 404);
+    }
+
+    $statuses = ['Pendente', 'Em Producao', 'Em Produção'];
+    $statusPlaceholders = implode(',', array_fill(0, count($statuses), '?'));
+    $sql = <<<SQL
+        SELECT
+            p.id,
+            p.status,
+            p.data_solicitacao,
+            s.nome AS solicitante_nome,
+            st.nivel_prioridade,
+            st.nome_setor,
+            gm.nome_modelo
+        FROM Pedido p
+        INNER JOIN Solicitante s ON s.id = p.solicitante_id
+        LEFT JOIN Setor st ON st.id = s.setor_id
+        LEFT JOIN Galeria_Modelos gm ON gm.id = p.modelo_id
+        WHERE p.unit_id = ?
+          AND p.status IN ($statusPlaceholders)
+        ORDER BY COALESCE(st.nivel_prioridade, 0) DESC, p.data_solicitacao ASC, p.id ASC
+    SQL;
+    $stmt = $db->prepare($sql);
+    $types = 'i' . str_repeat('s', count($statuses));
+    $params = array_merge([$unitId], $statuses);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $queue = [];
+    $position = 1;
+    while ($row = $result->fetch_assoc()) {
+        $normalizedStatus = normalize_status((string) ($row['status'] ?? 'Pendente'));
+        $queue[] = [
+            'id' => (int) $row['id'],
+            'position' => $position++,
+            'instructorName' => $row['solicitante_nome'] ?? 'Instrutor nao informado',
+            'sector' => $row['nome_setor'] ?: 'Sem setor',
+            'modelName' => $row['nome_modelo'] ?: 'Modelo personalizado',
+            'status' => $normalizedStatus === 'Em Producao' ? 'Imprimindo' : 'Em Espera',
+            'statusKey' => $normalizedStatus === 'Em Producao' ? 'printing' : 'waiting',
+            'createdAt' => $row['data_solicitacao'] ?? null,
+        ];
+    }
+
+    return [
+        'unit' => [
+            'id' => (int) $unit['id'],
+            'name' => $unit['nome_unidade'],
+            'city' => $unit['cidade'],
+            'state' => $unit['estado'],
+            'code' => $unit['codigo_senac'],
+        ],
+        'queue' => $queue,
+        'lastUpdatedAt' => gmdate('c'),
+        'refreshIntervalMs' => 15000,
+    ];
+}
+
+function fetch_public_unit_orders(mysqli $db, string $token): array
+{
+    ensure_public_unit_columns($db);
+
+    $unit = fetch_public_unit_by_token($db, $token);
+    if ($unit === null) {
+        throw http_error('Unidade nao encontrada.', 404);
+    }
+
+    $hasPrintDuration = column_exists($db, 'Pedido', 'duracao_impressao_minutos');
+    $sql = <<<SQL
+        SELECT
+            p.id,
+            p.status,
+            DATE(p.data_solicitacao) AS data_solicitacao,
+            p.data_limite,
+            p.finalidade,
+            p.observacoes,
+            p.prioridade_bandeira,
+            %s
+            s.nome AS solicitante_nome,
+            st.nome_setor,
+            gm.nome_modelo
+        FROM Pedido p
+        INNER JOIN Solicitante s ON s.id = p.solicitante_id
+        LEFT JOIN Setor st ON st.id = s.setor_id
+        LEFT JOIN Galeria_Modelos gm ON gm.id = p.modelo_id
+        WHERE p.unit_id = ?
+        ORDER BY
+            CASE
+                WHEN p.status IN ('Pendente') THEN 1
+                WHEN p.status IN ('Em Producao', 'Em Produção') THEN 2
+                WHEN p.status IN ('Concluido', 'Concluído', 'Retirado') THEN 3
+                WHEN p.status IN ('Cancelado') THEN 4
+                ELSE 5
+            END,
+            COALESCE(st.nivel_prioridade, 0) DESC,
+            p.data_solicitacao DESC,
+            p.id DESC
+    SQL;
+    $sql = sprintf(
+        $sql,
+        $hasPrintDuration ? 'p.duracao_impressao_minutos,' : 'NULL AS duracao_impressao_minutos,'
+    );
+
+    $stmt = $db->prepare($sql);
+    $unitId = (int) $unit['id'];
+    $stmt->bind_param('i', $unitId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $orders = [];
+    while ($row = $result->fetch_assoc()) {
+        $normalizedStatus = normalize_status((string) ($row['status'] ?? 'Pendente'));
+        $orders[] = [
+            'id' => (int) $row['id'],
+            'instructorName' => $row['solicitante_nome'] ?? 'Instrutor nao informado',
+            'sector' => $row['nome_setor'] ?: 'Sem setor',
+            'modelName' => $row['nome_modelo'] ?: 'Modelo personalizado',
+            'status' => public_order_status_label($normalizedStatus),
+            'statusKey' => public_order_status_key($normalizedStatus),
+            'createdAt' => $row['data_solicitacao'] ?? null,
+            'deadline' => $row['data_limite'] ?? null,
+            'purpose' => $row['finalidade'] ?? '',
+            'notes' => $row['observacoes'] ?? '',
+            'priority' => (int) ($row['prioridade_bandeira'] ?? 0),
+            'durationMinutes' => $row['duracao_impressao_minutos'] !== null ? (int) $row['duracao_impressao_minutos'] : null,
+        ];
+    }
+
+    return [
+        'unit' => [
+            'id' => (int) $unit['id'],
+            'name' => $unit['nome_unidade'],
+            'city' => $unit['cidade'],
+            'state' => $unit['estado'],
+            'code' => $unit['codigo_senac'],
+            'publicToken' => $unit['public_token'],
+        ],
+        'orders' => $orders,
+        'lastUpdatedAt' => gmdate('c'),
+        'refreshIntervalMs' => 15000,
+    ];
+}
+
+function fetch_public_unit_by_token(mysqli $db, string $token): ?array
+{
+    $token = trim($token);
+    if ($token === '' || !preg_match('/^[a-z0-9]{24}$/', $token)) {
+        return null;
+    }
+
+    $stmt = $db->prepare(
+        'SELECT id, nome_unidade, cidade, estado, codigo_senac, public_token
+         FROM Unidade
+         WHERE public_token = ?
+         LIMIT 1'
+    );
+    $stmt->bind_param('s', $token);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+
+    return $row ?: null;
+}
+
+function fetch_public_unit_by_id(mysqli $db, int $unitId): ?array
+{
+    if ($unitId <= 0) {
+        return null;
+    }
+
+    $stmt = $db->prepare(
+        'SELECT id, nome_unidade, cidade, estado, codigo_senac, public_token
+         FROM Unidade
+         WHERE id = ?
+         LIMIT 1'
+    );
+    $stmt->bind_param('i', $unitId);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+
+    return $row ?: null;
 }
 
 function fetch_filaments(mysqli $db, array $authUser): array
@@ -1239,12 +1568,43 @@ function ensure_auth_columns(mysqli $db): void
     }
 }
 
+function ensure_public_unit_columns(mysqli $db): void
+{
+    if (!table_exists($db, 'Unidade')) {
+        throw new RuntimeException('Tabela Unidade nao encontrada. Execute a migracao de multi-unidades.', 500);
+    }
+
+    if (!column_exists($db, 'Unidade', 'public_token')) {
+        $db->query('ALTER TABLE Unidade ADD COLUMN public_token CHAR(24) NULL AFTER codigo_senac');
+        $db->query('ALTER TABLE Unidade ADD CONSTRAINT uq_unidade_public_token UNIQUE (public_token)');
+    }
+
+    $result = $db->query('SELECT id FROM Unidade WHERE public_token IS NULL OR public_token = ""');
+    while ($row = $result->fetch_assoc()) {
+        $id = (int) ($row['id'] ?? 0);
+        if ($id <= 0) {
+            continue;
+        }
+
+        $token = generate_public_unit_token();
+        $stmt = $db->prepare('UPDATE Unidade SET public_token = ? WHERE id = ?');
+        $stmt->bind_param('si', $token, $id);
+        $stmt->execute();
+    }
+}
+
+function generate_public_unit_token(): string
+{
+    return strtolower(bin2hex(random_bytes(12)));
+}
+
 function save_user_photo(mysqli $db, array $authUser, array $input): void
 {
     $id = (int) ($input['id'] ?? 0);
-    $photo = save_base64_image((string) ($input['foto'] ?? ''), 'perfis');
+    $removePhoto = !empty($input['remover']);
+    $photo = $removePhoto ? null : save_base64_image((string) ($input['foto'] ?? ''), 'perfis');
 
-    if ($id <= 0 || $photo === null) {
+    if ($id <= 0 || (!$removePhoto && $photo === null)) {
         throw new InvalidArgumentException('Dados da foto de perfil invalidos.');
     }
 
@@ -1430,6 +1790,29 @@ function normalize_status(string $status): string
     ];
 
     return $map[$status] ?? $status;
+}
+
+function public_order_status_label(string $status): string
+{
+    return match ($status) {
+        'Pendente' => 'Em Espera',
+        'Em Producao' => 'Imprimindo',
+        'Concluido' => 'Concluído',
+        'Retirado' => 'Retirado',
+        'Cancelado' => 'Cancelado',
+        default => $status,
+    };
+}
+
+function public_order_status_key(string $status): string
+{
+    return match ($status) {
+        'Pendente' => 'waiting',
+        'Em Producao' => 'printing',
+        'Concluido', 'Retirado' => 'done',
+        'Cancelado' => 'canceled',
+        default => 'neutral',
+    };
 }
 
 function http_error(string $message, int $status): RuntimeException
