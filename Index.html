@@ -4,10 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Octopus - Gestão de Impressão 3D</title>
+<script>
+  window.__contrastEnabled = false;
+  try {
+    window.__contrastEnabled = localStorage.getItem('contrast') === 'active';
+  } catch (error) {}
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<script>
+  if (window.__contrastEnabled) {
+    document.body.classList.add('high-contrast');
+  }
+</script>
 <a class="skip-link" href="#main-content">Pular para o conteudo principal</a>
 
 <div id="ld" aria-hidden="true">
@@ -43,7 +54,7 @@
         </div>
       </div>
       <h1 id="login-title" class="lc-title">Octopus</h1>
-      <p class="lc-sub">Gestao de impressao 3D com autenticacao segura.</p>
+      <p class="lc-sub">Gestão Inteligente com Autenticação Segura.</p>
       <form class="login-form" onsubmit="doLogin(event)">
         <div class="fg2 full">
           <label class="fl" for="login-user">Usuario</label>
@@ -71,7 +82,7 @@
           <p class="assistive-copy">Use seu e-mail para acessar.</p>
           <button class="login-link" type="button" onclick="submitForgotPassword()">Esqueceu a senha?</button>
         </div>
-        <a class="login-direct-link" href="unidades.php">Acessar pagina publica de unidades</a>
+        <a class="login-direct-link" href="unidades.php">Acessar página pública de unidades</a>
         <button class="lbtn" type="submit">Entrar no sistema</button>
       </form>
     </div>
@@ -164,19 +175,31 @@
           </div>
         </div>
         <div class="sg">
-          <div class="sc"><div class="sci b"><i data-lucide="printer"></i></div><div class="sv" id="stat-pedidos">0</div><div class="sl">Pedidos Ativos</div><div class="sd" id="stat-pedidos-det">Sem movimentacao recente</div></div>
-          <div class="sc"><div class="sci y"><i data-lucide="cylinder"></i></div><div class="sv" id="stat-estoque">0</div><div class="sl">Rolos em Estoque</div><div class="sd w" id="stat-estoque-det">Nenhum alerta</div></div>
-          <div class="sc"><div class="sci g"><i data-lucide="badge-check"></i></div><div class="sv" id="stat-concluidos">0</div><div class="sl">Concluidos</div><div class="sd" id="stat-concluidos-det">Historico do sistema</div></div>
+          <div class="sc"><div class="sci b"><i data-lucide="printer"></i></div><div class="sv" id="stat-pedidos">0</div><div class="sl">Pedidos Concluídos</div><div class="sd" id="stat-pedidos-det">Sem movimentacao recente</div></div>
+          <div class="sc stock-stat-card" id="stock-stat-card" role="button" tabindex="0" onclick="go('estoque')" onkeydown="handleStockCardKeydown(event)">
+            <div class="stock-stat-icon-wrap">
+              <div class="sci y"><i data-lucide="cylinder"></i></div>
+              <span class="stock-stat-alert-badge" id="stock-stat-alert-badge" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                  <path d="M12 7.5v5"></path>
+                  <path d="M12 16.5h.01"></path>
+                </svg>
+              </span>
+            </div>
+            <div class="sv" id="stat-estoque">0</div>
+            <div class="sl">Bobinas em Estoque</div>
+            <div class="sd" id="stat-estoque-det">Nenhum alerta</div>
+          </div>
+          <div class="sc"><div class="sci g"><i data-lucide="badge-check"></i></div><div class="sv" id="stat-concluidos">0g</div><div class="sl">Consumo de Bobinas</div><div class="sd" id="stat-concluidos-det">0 bobinas consumidas</div></div>
           <div class="sc"><div class="sci p"><i data-lucide="users-round"></i></div><div class="sv" id="stat-solicitantes">0</div><div class="sl">Solicitantes</div><div class="sd" id="stat-solicitantes-det">0 setores ativos</div></div>
         </div>
-        <div class="al w" id="dash-alert" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg><span id="dash-alert-text"></span></div>
         <div class="dg">
-          <div class="g">
-            <div class="ch dashboard-card-head"><div class="dashboard-card-head-copy"><div class="ct">Fila Prioritaria</div><div class="cs">Ordenada por setor e data</div></div><button class="btn bg bsm" type="button" onclick="go('pedidos-admin')">Ver tudo</button></div>
+          <div class="g dashboard-queue-card">
+            <div class="ch dashboard-card-head"><div class="dashboard-card-head-copy"><div class="ct">Fila Prioritária</div><div class="cs">Ordenada por setor e data</div></div><button class="btn bg bsm" type="button" onclick="go('pedidos-admin')">Ver tudo</button></div>
             <div id="fila-prev"></div>
           </div>
-          <div class="g">
-            <div class="ch dashboard-card-head dashboard-card-head-compact"><div class="dashboard-card-head-copy"><div class="ct">Status dos Pedidos</div><div class="cs dashboard-card-head-spacer" aria-hidden="true">&nbsp;</div></div></div>
+          <div class="g dashboard-status-card">
+            <div class="ch dashboard-card-head dashboard-card-head-compact"><div class="dashboard-card-head-copy"><div class="ct">Status dos Pedidos</div><div class="cs dashboard-card-head-spacer" aria-hidden="true">&nbsp;</div></div><button class="btn bg bsm dashboard-clear-filter" id="dashboard-status-clear" type="button" onclick="clearDashboardStatusFilter()" style="display:none">Limpar filtro</button></div>
             <div class="dw">
               <div class="dp">
                 <div id="donut-chart"></div>
@@ -200,7 +223,7 @@
         <div class="sh"><div><h1>Fila de Pedidos</h1><p id="queue-subtitle">Acompanhe a fila de impressao da unidade visivel</p></div></div>
         <div class="fb">
           <div class="sw2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><input class="si" id="src-p" placeholder="Buscar pedido, solicitante..." oninput="filtP()"></div>
-          <select class="fsel" id="flt-s" onchange="filtP()"><option value="">Todos status</option><option>Pendente</option><option>Em Producao</option><option>Concluido</option><option>Retirado</option><option>Cancelado</option></select>
+          <select class="fsel" id="flt-s" onchange="filtP()"><option value="">Todos status</option><option value="Pendente">Pendente</option><option value="Em Producao">Em Produção</option><option value="Concluido">Concluído</option><option value="Retirado">Retirado</option><option value="Cancelado">Cancelado</option></select>
           <select class="fsel" id="flt-st" onchange="filtP()"><option value="">Todos setores</option></select>
         </div>
         <div class="g"><div class="tw"><table><thead><tr><th>#</th><th>Solicitante</th><th>Setor</th><th>Modelo</th><th>Filamento</th><th>Prioridade</th><th>Status</th><th>Data</th><th>Acoes</th></tr></thead><tbody id="tbp"></tbody></table></div></div>
@@ -208,7 +231,6 @@
 
       <div class="sec" id="sec-estoque">
         <div class="sh"><div><h1>Estoque de Filamentos</h1><p>Monitore e gerencie os rolos disponiveis</p></div><button class="btn bp admin-only" type="button" onclick="openFilModal()">Adicionar Rolo</button></div>
-        <div class="al d" id="al-crit" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg><span id="al-crit-text">Filamento(s) em nivel critico.</span></div>
         <div class="fg" id="fil-grid"></div>
         <div style="margin-top:22px" class="g"><div class="ch"><div class="ct">Historico de Movimentacoes</div></div><div class="tw"><table><thead><tr><th>Data</th><th>Filamento</th><th>Tipo</th><th>Quantidade</th></tr></thead><tbody id="tbh"></tbody></table></div></div>
       </div>
@@ -320,11 +342,11 @@
   <div class="mb">
     <p style="font-size:0.8rem;color:var(--tx2);margin-bottom:14px">Pedido <b id="st-pid" style="color:var(--tx)"></b></p>
     <label class="fl" for="st-sel">Novo Status</label>
-    <select class="fin" id="st-sel" onchange="toggleStatusWeightField()"><option>Pendente</option><option>Em Producao</option><option>Concluido</option><option>Retirado</option><option>Cancelado</option></select>
+    <select class="fin" id="st-sel" onchange="toggleStatusWeightField()"><option value="Pendente">Pendente</option><option value="Em Producao">Em Produção</option><option value="Concluido">Concluído</option><option value="Retirado">Retirado</option><option value="Cancelado">Cancelado</option></select>
     <div id="st-weight-wrap" style="display:none;margin-top:14px">
-      <label class="fl" for="st-peso">Quantidade Gasta (g)</label>
+      <label class="fl" for="st-peso">Quanto de filamento foi utilizado (g)?</label>
       <input type="number" min="0" step="0.1" class="fin" id="st-peso" placeholder="Ex: 27.5">
-      <p class="field-tip">Ao concluir ou retirar, esse valor sera gravado no pedido e descontado automaticamente do estoque.</p>
+      <p class="field-tip">Ao concluir ou retirar, esse valor sera gravado no pedido, validado contra o estoque e registrado como saida.</p>
     </div>
     <div class="fa"><button class="btn bg" type="button" onclick="closeM('ms')">Cancelar</button><button class="btn bp" type="button" onclick="confirmSt()">Confirmar</button></div>
   </div>
@@ -386,6 +408,12 @@
 
 <div class="tw2" id="tw2" aria-live="polite" aria-atomic="true"></div>
 <span id="tb-t" hidden aria-hidden="true"></span>
+<button id="contrast-toggle" class="contrast-toggle" type="button" aria-label="Ativar alto contraste" aria-pressed="false" title="Ativar alto contraste">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+    <path d="M12 3a9 9 0 1 0 0 18c0-6 0-12 0-18Z"></path>
+    <path d="M12 3a9 9 0 0 1 0 18"></path>
+  </svg>
+</button>
 <div vw class="enabled">
   <div vw-access-button class="active"></div>
   <div vw-plugin-wrapper>
@@ -398,6 +426,7 @@
   });
 </script>
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="contrast.js" defer></script>
 <script src="app.js" defer></script>
 <script>
   (function(){

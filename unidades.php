@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Unidades Publicas | Octopus</title>
   <meta name="robots" content="noindex,nofollow">
+  <script>
+    window.__contrastEnabled = false;
+    try {
+      window.__contrastEnabled = localStorage.getItem('contrast') === 'active';
+    } catch (error) {}
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
@@ -12,6 +18,11 @@
   <link rel="stylesheet" href="public-unit.css">
 </head>
 <body>
+  <script>
+    if (window.__contrastEnabled) {
+      document.body.classList.add('high-contrast');
+    }
+  </script>
   <a class="skip-link" href="#public-main">Pular para o conteudo principal</a>
 
   <main class="public-page" id="public-main">
@@ -66,6 +77,12 @@
     </section>
   </main>
 
+  <button id="contrast-toggle" class="contrast-toggle" type="button" aria-label="Ativar alto contraste" aria-pressed="false" title="Ativar alto contraste">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+      <path d="M12 3a9 9 0 1 0 0 18c0-6 0-12 0-18Z"></path>
+      <path d="M12 3a9 9 0 0 1 0 18"></path>
+    </svg>
+  </button>
   <div vw class="enabled">
     <div vw-access-button class="active"></div>
     <div vw-plugin-wrapper>
@@ -73,6 +90,7 @@
     </div>
   </div>
 
+  <script src="contrast.js" defer></script>
   <script src="public-unit.js" defer></script>
   <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
   <script>

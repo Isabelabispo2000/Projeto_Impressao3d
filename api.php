@@ -188,6 +188,8 @@ function bootstrap_payload(mysqli $db, array $authUser): array
         'currentUser' => $authUser,
         'units' => fetch_units($db),
         'users' => fetch_users($db, $authUser),
+        'consumptionStats' => fetch_consumption_stats($db, $authUser),
+        'filamentStats' => fetch_filament_stats($db, $authUser),
         'filaments' => fetch_filaments($db, $authUser),
         'models' => fetch_models($db),
         'orders' => fetch_orders($db, $authUser),
@@ -950,6 +952,48 @@ function fetch_filaments(mysqli $db, array $authUser): array
     return $items;
 }
 
+function fetch_filament_stats(mysqli $db, array $authUser): array
+{
+    $sql = <<<SQL
+        SELECT
+            ef.unit_id,
+            COUNT(*) AS total_cadastradas,
+            SUM(CASE WHEN ef.peso_atual_gramas > 0 THEN 1 ELSE 0 END) AS total_ativas
+        FROM Estoque_Filamento ef
+        %s
+        GROUP BY ef.unit_id
+    SQL;
+    $sql = sprintf($sql, scope_where_clause('ef.unit_id', $authUser));
+    $stmt = scoped_prepare($db, $sql, 'ef.unit_id', $authUser);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $byUnit = [];
+    $totals = [
+        'registered' => 0,
+        'active' => 0,
+    ];
+
+    while ($row = $result->fetch_assoc()) {
+        $unitId = (int) ($row['unit_id'] ?? 0);
+        $registered = (int) ($row['total_cadastradas'] ?? 0);
+        $active = (int) ($row['total_ativas'] ?? 0);
+
+        $byUnit[] = [
+            'unitId' => $unitId,
+            'registered' => $registered,
+            'active' => $active,
+        ];
+        $totals['registered'] += $registered;
+        $totals['active'] += $active;
+    }
+
+    return [
+        'totals' => $totals,
+        'byUnit' => $byUnit,
+    ];
+}
+
 function fetch_models(mysqli $db): array
 {
     $result = $db->query('SELECT id, nome_modelo, descricao, peso_estimado, link_stl, foto_exemplo FROM Galeria_Modelos ORDER BY id');
@@ -1036,6 +1080,47 @@ function fetch_orders(mysqli $db, array $authUser): array
     }
 
     return $items;
+}
+
+function fetch_consumption_stats(mysqli $db, array $authUser): array
+{
+    $sql = <<<SQL
+        SELECT
+            p.unit_id,
+            COALESCE(SUM(CASE
+                WHEN p.status IN ('Concluido', 'Concluído', 'Finalizado', 'Retirado') THEN COALESCE(p.peso_final_gasto, 0)
+                ELSE 0
+            END), 0) AS total_consumed
+        FROM Pedido p
+        %s
+        GROUP BY p.unit_id
+    SQL;
+    $sql = sprintf($sql, scope_where_clause('p.unit_id', $authUser));
+    $stmt = scoped_prepare($db, $sql, 'p.unit_id', $authUser);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $byUnit = [];
+    $total = 0.0;
+    while ($row = $result->fetch_assoc()) {
+        $unitTotal = round((float) ($row['total_consumed'] ?? 0), 2);
+        $total += $unitTotal;
+        $byUnit[] = [
+            'unitId' => (int) ($row['unit_id'] ?? 0),
+            'totalWeight' => $unitTotal,
+            'rolls' => round($unitTotal / 1000, 2),
+        ];
+    }
+
+    $total = round($total, 2);
+
+    return [
+        'totals' => [
+            'totalWeight' => $total,
+            'rolls' => round($total / 1000, 2),
+        ],
+        'byUnit' => $byUnit,
+    ];
 }
 
 function fetch_history(mysqli $db, array $authUser): array
